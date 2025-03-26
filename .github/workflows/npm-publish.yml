@@ -2,11 +2,13 @@ name: Publish to npm
 
 on:
   workflow_run:
-    tags:
-      - 'v*'  # Triggers when a tag starting with "v" is pushed
+    workflows: ["Auto Tag on Semantic Version PR"]
+    types:
+      - completed
 
 jobs:
   publish:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -15,14 +17,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20  # Use the Node.js version you need
+          node-version: 20
           registry-url: 'https://registry.npmjs.org/'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
       - name: Build package
-        run: yarn build  # Change this if your build script is different
+        run: yarn build
 
       - name: Publish to npm
         run: yarn publish --access public
