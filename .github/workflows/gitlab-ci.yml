@@ -1,0 +1,40 @@
+stages:
+  - tag
+  - publish
+
+# 🏷️ Auto-tag when merging to master
+auto_tag:
+  stage: tag
+  only:
+    refs:
+      - master
+  script:
+    - echo "Checking PR title for version..."
+    - VERSION=$(git log -1 --pretty=%B | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+')
+    - |
+      if [ -n "$VERSION" ]; then
+        echo "Version found: $VERSION"
+        git config --global user.name "gitlab-ci"
+        git config --global user.email "gitlab-ci@users.noreply.gitlab.com"
+        git tag "$VERSION"
+        git push origin "$VERSION"
+      else
+        echo "No semantic version found, skipping tag creation."
+        exit 0
+      fi
+
+# 🚀 Publish to npm when a new tag is pushed
+npm_publish:
+  stage: publish
+  only:
+    - tags  # Trigger only on tag push
+  before_script:
+    - npm config set //registry.npmjs.org/:_authToken "${NPM_TOKEN}"
+  script:
+    - yarn install --frozen-lockfile
+    - yarn build  # Change this if your build script is different
+    - yarn publish --access public
+  variables:
+    NODE_AUTH_TOKEN: $NPM_TOKEN
+  except:
+    - branches  # Don't run on branches
