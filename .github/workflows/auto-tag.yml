@@ -11,7 +11,14 @@ jobs:
   tag:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # This grants permission to push tags
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Ensure full history for tagging
+
       - name: Extract semantic version from PR title
         id: get_version
         run: |
@@ -24,10 +31,14 @@ jobs:
             exit 0
           fi
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Create and push tag
         run: |
           git tag ${{ env.version }}
           git push origin ${{ env.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Ensure this token has write access
