@@ -1,0 +1,10 @@
+{
+  "name": "react-native-vpage-sdk",
+  "version": "1.0.0",
+  "description": "react-native-vpage-sdk is a lightweight and easy-to-use React Native SDK for integrating Agora-powered real-time video calls with WebSocket-based session tracking.\\n\\nDesigned for Android and iOS, this SDK simplifies the implementation of Agora video calls, ensuring seamless connection management and agent-based call routing.\\n\\nFeatures:\\n✅ Easy Agora Integration – Initialize and start calls with minimal setup.\\n✅ WebSocket Session Tracking – Keep track of live sessions in real time.\\n✅ Agent-Based Call Handling – Connect users with agents dynamically.",
+  "main": "index.js",
+  "repository": "https://github.com/Nerdya/react-native-vpage-sdk.git",
+  "author": "cuongnk <cuongnk@3tit.vn>",
+  "license": "MIT",
+  "private": false
+}
