@@ -1,4 +1,4 @@
 export * from './agora/AgoraManager';
 export * from './agora/useAgora';
-export * from './network/WebSocketService';
-export * from './network/ApiService';
+export * from './network/get';
+export * from './network/post';
