@@ -54,7 +54,7 @@ class APIService {
   // API methods
   async getConfigInfo(appointmentId: string) {
     try {
-      const response = await this.get(environment.GET_CONFIG_INFO, { params: { appointment_id: appointmentId } });
+      const response = await this.get(environment.GET_CONFIG_INFO, { appointment_id: appointmentId });
       return response;
     } catch (error) {
       console.error('Error fetching info:', error);
