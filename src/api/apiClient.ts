@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 export type APIClientOptions = {
+  baseURL?: string;
   timeout?: number;
   headers?: Record<string, string>;
   token?: string;
@@ -9,14 +10,13 @@ export type APIClientOptions = {
 class APIClient {
   private client: AxiosInstance;
 
-  constructor(baseURL: string, options?: APIClientOptions) {
+  constructor(options?: APIClientOptions) {
     this.client = axios.create({
-      baseURL,
-      timeout: options?.timeout || 10000,
+      baseURL: options?.baseURL || 'https://ovkyc-gateway-server-uat.mobifi.vn',
+      timeout: options?.timeout || 30000,
       headers: options?.headers || { 'Content-Type': 'application/json' },
     });
 
-    // Attach token if provided
     if (options?.token) {
       this.client.interceptors.request.use(config => {
         config.headers.Authorization = `Bearer ${options?.token}`;
@@ -31,6 +31,6 @@ class APIClient {
 }
 
 // Factory function to create an instance
-export function createAPIClient(baseURL: string, options?: APIClientOptions) {
-  return new APIClient(baseURL, options).getClient();
+export function createAPIClient(options?: APIClientOptions) {
+  return new APIClient(options).getClient();
 }
