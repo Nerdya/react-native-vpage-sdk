@@ -1,4 +1,2 @@
-export * from './agora/AgoraManager';
-export * from './agora/useAgora';
-export * from './network/get';
-export * from './network/post';
+export * from './agora';
+export * from './api';
