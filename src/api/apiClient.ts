@@ -1,11 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-
-export type APIClientOptions = {
-  baseURL?: string;
-  timeout?: number;
-  headers?: Record<string, string>;
-  token?: string;
-};
+import { APIClientOptions } from '../types/APIClientOptions';
 
 class APIClient {
   private client: AxiosInstance;

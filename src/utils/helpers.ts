@@ -38,3 +38,10 @@ export const environment = {
   GET_DYNAMIC_REDIRECT: '/vekyc/meeting/:id/generate-redirect',
   SAVE_LOGS: '/vekyc/logs',
 }
+
+export enum ActionHistory {
+  CUSTOMER_ACTIVED_LINK = 'CUSTOMER_ACTIVED_LINK',
+  CUSTOMER_OTP_CONFIRMED = 'CUSTOMER_OTP_CONFIRMED',
+  CUSTOMER_TEST_CAM_MIC = 'CUSTOMER_TEST_CAM_MIC',
+  CUSTOMER_INCOMMING = 'CUSTOMER_INCOMMING',
+}
