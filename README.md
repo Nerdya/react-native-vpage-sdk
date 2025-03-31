@@ -1,10 +1,10 @@
 # react-native-vpage-sdk
 
-`react-native-vpage-sdk` is a lightweight and easy-to-use React Native SDK for integrating Agora-powered real-time video calls with WebSocket-based session tracking. Designed for Android and iOS, this SDK simplifies the implementation of Agora video calls, ensuring seamless connection management and agent-based call routing.
+`react-native-vpage-sdk` is a lightweight and easy-to-use React Native SDK for integrating real-time video calls with WebSocket-based session tracking. Designed for Android and iOS, this SDK simplifies the implementation of video calls, ensuring seamless connection management and agent-based call routing.
 
 Features:
 
-✅ Easy Agora Integration – Initialize and start calls with minimal setup.
+✅ Easy Integration – Initialize and start calls with minimal setup.
 
 ✅ WebSocket Session Tracking – Keep track of live sessions in real time.
 
@@ -12,37 +12,53 @@ Features:
 
 ## Installation
 
-To install `react-native-vpage-sdk`, use Yarn:
+### Installing (React Native >= 0.60.0)
 
-```sh
+Install `react-native-vpage-sdk` (^4.0.0):
+
+
+```shell script
 yarn add react-native-vpage-sdk
 ```
 
-or npm:
+or
 
-```sh
-npm install react-native-vpage-sdk
+```shell script
+npm i --save react-native-vpage-sdk
 ```
 
-## iOS Setup
+### iOS Setup
 
-After installing the package, navigate to your project's `ios/` directory and run:
+Go to your **ios** folder and run:
 
-```sh
-cd ios && pod install
+```shell script
+pod install
 ```
 
-This ensures that all necessary dependencies, including `react-native-agora`, are properly linked to your iOS project.
+## General Usage
 
-## Usage
+```typescript
 
-```js
-import { multiply } from 'react-native-vpage-sdk';
-
-// ...
-
-const result = await multiply(3, 7);
 ```
+
+### Available Functions
+
+| Function                                                  | Description                                                      |
+|-----------------------------------------------------------|------------------------------------------------------------------|
+| `getConfigInfo(appointmentId)`                            | Fetches configuration information for a given appointment.       |
+| `createEkycMeeting(appointmentId, agentId?)`              | Creates an eKYC meeting for the specified appointment and agent. |
+| `saveLog(actionHistory, detail?, sessionKey?)`            | Saves a log entry with optional details and session key.         |
+| `verifyCaptcha(secret, captchaToken)`                     | Verifies a CAPTCHA token using the provided secret.              |
+| `createEkycSubmit(captchaToken, appointmentId, agentId?)` | Submits eKYC data for the specified appointment and agent.       |
+| `verifyOtp(appointmentId, otp)`                           | Verifies an OTP for the specified appointment.                   |
+| `resendOtp(appointmentId)`                                | Resends an OTP for the specified appointment.                    |
+| `checkSelfKyc(sessionKey)`                                | Checks if the session is self-KYC enabled.                       |
+| `createEkycHook(sessionId, sessionKey, agentId?)`         | Creates an eKYC hook for the specified session and agent.        |
+| `closeVideo(sessionKey)`                                  | Closes the video session for the specified session key.          |
+
+## Demo
+
+Check out the [Demo Application](https://github.com/Nerdya/my-video-app) to see how to use this SDK in a real-world project.
 
 ## Contributing
 
