@@ -64,11 +64,11 @@ class APIService {
     }
   }
 
-  async createEkycMeeting(appointmentId: string, agentId = null) {
+  async createMeeting(appointmentId: string, agentId = null) {
     try {
       const ids = { id: appointmentId };
       const payload = { agent_id: agentId };
-      const res = await this.postChildren(environment.EKYC_MEETING, ids, payload);
+      const res = await this.postChildren(environment.CREATE_MEETING, ids, payload);
       return res as ApiResponse<any>;
     } catch (error) {
       console.error('Error creating meeting:', error);
@@ -79,7 +79,7 @@ class APIService {
   async saveLog(actionHistory: ActionHistory, detail = null, sessionKey = null) {
     try {
       const payload = { actionHistory, detail, sessionKey };
-      const res = await this.post(environment.SAVE_CONTRACT_ACTION, payload);
+      const res = await this.post(environment.SAVE_LOG, payload);
       return res as ApiResponse<any>;
     } catch (error) {
       console.error('Error saving log:', error);
@@ -87,29 +87,29 @@ class APIService {
     }
   }
 
-  async verifyCaptcha(secret: string, captchaToken: string) {
-    try {
-      const payload = { secret, response: captchaToken };
-      const res = await this.post(environment.VERIFY_CAPTCHA, payload);
-      return res as ApiResponse<any>;
-    } catch (error) {
-      console.error('Error verifying captcha:', error);
-      throw error;
-    }
-  }
+  // async verifyCaptcha(secret: string, captchaToken: string) {
+  //   try {
+  //     const payload = { secret, response: captchaToken };
+  //     const res = await this.post(environment.VERIFY_CAPTCHA, payload);
+  //     return res as ApiResponse<any>;
+  //   } catch (error) {
+  //     console.error('Error verifying captcha:', error);
+  //     throw error;
+  //   }
+  // }
 
-  async createEkycSubmit(captchaToken: string, appointmentId: string, agentId = null) {
+  async submit(appointmentId: string, agentId = null) {
     try {
-      const payload = { captchaToken, id: appointmentId, agent_id: agentId };
-      const res = await this.post(environment.EKYC_SUBMIT, payload);
+      const payload = { id: appointmentId, agent_id: agentId };
+      const res = await this.post(environment.SUBMIT, payload);
       return res as ApiResponse<EkycSubmitDto>;
     } catch (error) {
-      console.error('Error creating submission:', error);
+      console.error('Error submitting:', error);
       throw error;
     }
   }
 
-  async verifyOtp(appointmentId: string, otp: string) {
+  async verifyOTP(appointmentId: string, otp: string) {
     try {
       const payload = { uuid: appointmentId, appointmentId, otp };
       const res = await this.post(environment.VERIFY_OTP, payload);
@@ -120,7 +120,7 @@ class APIService {
     }
   }
 
-  async resendOtp(appointmentId: string) {
+  async resendOTP(appointmentId: string) {
     try {
       const payload = { uuid: appointmentId };
       const res = await this.post(environment.RESEND_OTP, payload);
@@ -131,7 +131,7 @@ class APIService {
     }
   }
 
-  async checkSelfKyc(sessionKey: string) {
+  async checkSelfKYC(sessionKey: string) {
     try {
       const params = { sessionKey };
       const res = await this.get(environment.CHECK_SELF_KYC, params);
@@ -142,13 +142,13 @@ class APIService {
     }
   }
 
-  async createEkycHook(sessionId: string, sessionKey: string, agentId = null) {
+  async hook(sessionId: string, sessionKey: string, agentId = null) {
     try {
       const payload = { sessionId, sessionKey, agentId };
-      const res = await this.post(environment.EKYC_HOOK, payload);
+      const res = await this.post(environment.HOOK, payload);
       return res as ApiResponse<any>;
     } catch (error) {
-      console.error('Error creating hook:', error);
+      console.error('Error hooking:', error);
       throw error;
     }
   }
@@ -156,10 +156,26 @@ class APIService {
   async closeVideo(sessionKey: string) {
     try {
       const payload = { sessionKey, type: 'USER' };
-      const res = await this.post(environment.EKYC_CLOSE_VIDEO, payload);
+      const res = await this.post(environment.CLOSE_VIDEO, payload);
       return res as ApiResponse<any>;
     } catch (error) {
       console.error('Error closing video:', error);
+      throw error;
+    }
+  }
+
+  async rateCall(callRating: number, callFeedback: string, agentRating: number, agentFeedback: string) {
+    try {
+      const payload = {
+        rating_video_call: callRating,
+        customer_feedback: callFeedback,
+        rating_agent: agentRating,
+        customer_feedback_agent: agentFeedback
+      };
+      const res = await this.post(environment.RATING, payload);
+      return res as ApiResponse<any>;
+    } catch (error) {
+      console.error('Error rating:', error);
       throw error;
     }
   }
