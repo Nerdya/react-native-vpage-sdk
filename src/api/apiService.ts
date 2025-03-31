@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { createAPIClient } from './apiClient';
 import { ActionHistory, environment } from '../utils/helpers';
-import { APIClientOptions, ApiResponse, ConfigDto, EkycSubmitDto, ResendOTPDto, VerifyOTPDto } from '../types';
+import { APIClientOptions, ApiResponse, CheckSelfKycDto, ConfigDto, EkycSubmitDto, ResendOTPDto, VerifyOTPDto } from '../types';
 
 class APIService {
   private client: AxiosInstance;
@@ -131,16 +131,38 @@ class APIService {
     }
   }
 
-  // async createEkycHook(appointmentId: string, agentId = null) {
-  //   try {
-  //     const payload = { id: appointmentId, agent_id: agentId };
-  //     const res = await this.post(environment.EKYC_HOOK, payload);
-  //     return res as ApiResponse<any>;
-  //   } catch (error) {
-  //     console.error('Error creating hook:', error);
-  //     throw error;
-  //   }
-  // }
+  async checkSelfKyc(sessionKey: string) {
+    try {
+      const params = { sessionKey };
+      const res = await this.get(environment.CHECK_SELF_KYC, params);
+      return res as ApiResponse<CheckSelfKycDto>;
+    } catch (error) {
+      console.error('Error checking self KYC:', error);
+      throw error;
+    }
+  }
+
+  async createEkycHook(sessionId: string, sessionKey: string, agentId = null) {
+    try {
+      const payload = { sessionId, sessionKey, agentId };
+      const res = await this.post(environment.EKYC_HOOK, payload);
+      return res as ApiResponse<any>;
+    } catch (error) {
+      console.error('Error creating hook:', error);
+      throw error;
+    }
+  }
+
+  async closeVideo(sessionKey: string) {
+    try {
+      const payload = { sessionKey, type: 'USER' };
+      const res = await this.post(environment.EKYC_CLOSE_VIDEO, payload);
+      return res as ApiResponse<any>;
+    } catch (error) {
+      console.error('Error closing video:', error);
+      throw error;
+    }
+  }
 }
 
 // Export a function to create an API service instance
