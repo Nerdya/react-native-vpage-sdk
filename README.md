@@ -16,7 +16,6 @@ Features:
 
 Install `react-native-vpage-sdk` (^4.0.0):
 
-
 ```shell script
 yarn add react-native-vpage-sdk
 ```
@@ -43,18 +42,18 @@ pod install
 
 ### Available Functions
 
-| Function                                                  | Description                                                      |
-|-----------------------------------------------------------|------------------------------------------------------------------|
-| `getConfigInfo(appointmentId)`                            | Fetches configuration information for a given appointment.       |
-| `createEkycMeeting(appointmentId, agentId?)`              | Creates an eKYC meeting for the specified appointment and agent. |
-| `saveLog(actionHistory, detail?, sessionKey?)`            | Saves a log entry with optional details and session key.         |
-| `verifyCaptcha(secret, captchaToken)`                     | Verifies a CAPTCHA token using the provided secret.              |
-| `createEkycSubmit(captchaToken, appointmentId, agentId?)` | Submits eKYC data for the specified appointment and agent.       |
-| `verifyOtp(appointmentId, otp)`                           | Verifies an OTP for the specified appointment.                   |
-| `resendOtp(appointmentId)`                                | Resends an OTP for the specified appointment.                    |
-| `checkSelfKyc(sessionKey)`                                | Checks if the session is self-KYC enabled.                       |
-| `createEkycHook(sessionId, sessionKey, agentId?)`         | Creates an eKYC hook for the specified session and agent.        |
-| `closeVideo(sessionKey)`                                  | Closes the video session for the specified session key.          |
+| Function                                                         | Description                                                             |
+|------------------------------------------------------------------|-------------------------------------------------------------------------|
+| `getConfigInfo(appointmentId)`                                   | Retrieves configuration details for a specific appointment.             |
+| `createMeeting(appointmentId, agentId?)`                         | Initiates an eKYC meeting for the given appointment and optional agent. |
+| `saveLog(actionHistory, detail?, sessionKey?)`                   | Logs an action with optional details and session key for tracking.      |
+| `submit(appointmentId, agentId?)`                                | Submits eKYC data for the specified appointment and optional agent.     |
+| `verifyOTP(appointmentId, otp)`                                  | Confirms an OTP for the given appointment.                              |
+| `resendOTP(appointmentId)`                                       | Sends a new OTP for the specified appointment.                          |
+| `checkSelfKYC(sessionKey)`                                       | Verifies if the session is eligible for self-KYC.                       |
+| `hook(sessionId, sessionKey, agentId?)`                          | Creates a hook for the specified session and optional agent.            |
+| `closeVideo(sessionKey)`                                         | Ends the video session for the provided session key.                    |
+| `rateCall(callRating, callFeedback, agentRating, agentFeedback)` | Submits ratings and feedback for the video call and agent.              |
 
 ## Demo
 
