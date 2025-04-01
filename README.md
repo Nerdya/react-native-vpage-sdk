@@ -34,13 +34,53 @@ Go to your **ios** folder and run:
 pod install
 ```
 
-## General Usage
+## Example Usage
 
 ```typescript
+import { createVekycService, RtcSurfaceView } from 'react-native-vpage-sdk';
 
+const vekycService = createVekycService('YOUR_APP_ID');
+
+const initialize = async () => {
+  await vekycService.initialize();
+
+  vekycService.registerEventHandler(
+    (uid) => console.log(`User ${uid} joined`),
+    (uid) => console.log(`User ${uid} left`)
+  );
+
+  await vekycService.joinChannel('YOUR_TOKEN', 'YOUR_CHANNEL_NAME', 12345, true);
+  vekycService.enableVideo();
+};
+
+// To leave the channel and clean up
+const leave = () => {
+  vekycService.leaveChannel();
+  vekycService.cleanup();
+};
+
+// Render local video
+<RtcSurfaceView
+  canvas={{
+    uid: 12345,
+    sourceType: 0, // VideoSourceType.VideoSourceCamera
+  }}
+  style={{ width: '100%', height: 200 }}
+/>;
+
+// Render remote video
+<RtcSurfaceView
+  canvas={{
+    uid: 67890,
+    sourceType: 1, // VideoSourceType.VideoSourceRemote
+  }}
+  style={{ width: '100%', height: 200 }}
+/>;
 ```
 
-### Available Functions
+## Available Functions
+
+### API
 
 | Function                                                         | Description                                                             |
 |------------------------------------------------------------------|-------------------------------------------------------------------------|
@@ -54,6 +94,18 @@ pod install
 | `hook(sessionId, sessionKey, agentId?)`                          | Creates a hook for the specified session and optional agent.            |
 | `closeVideo(sessionKey)`                                         | Ends the video session for the provided session key.                    |
 | `rateCall(callRating, callFeedback, agentRating, agentFeedback)` | Submits ratings and feedback for the video call and agent.              |
+
+### VEKYC
+
+| Function                                            | Description                                                             |
+|-----------------------------------------------------|-------------------------------------------------------------------------|
+| `initialize()`                                      | Initializes the engine and requests necessary permissions (on Android). |
+| `registerEventHandler(onUserJoined, onUserOffline)` | Registers event handlers for user join and leave callbacks.             |
+| `joinChannel(token, channelName, localUid)`         | Joins a channel as a host.                                              |
+| `leaveChannel()`                                    | Leaves the current channel and resets the internal state.               |
+| `enableVideo()`                                     | Enables video and starts the local video preview.                       |
+| `cleanup()`                                         | Cleans up the engine, stops the video preview, and releases resources.  |
+| `RtcSurfaceView`                                    | A React Native component for rendering local or remote video streams.   |
 
 ## Demo
 
