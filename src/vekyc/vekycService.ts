@@ -3,7 +3,6 @@ import {
   ChannelProfileType,
   ClientRoleType,
   IRtcEngine,
-  RtcConnection,
   IRtcEngineEventHandler,
   createAgoraRtcEngine,
   RtcSurfaceView,
@@ -18,8 +17,6 @@ import {
 class VekycService {
   private engine?: IRtcEngine;
   private eventHandler?: IRtcEngineEventHandler;
-  private isJoined: boolean = false;
-  private remoteUid: number = 0;
 
   /**
    * Creates an instance of VekycService.
@@ -64,8 +61,6 @@ class VekycService {
    * @throws Will throw an error if the user is already joined or the engine is not initialized.
    */
   async joinChannel(token: string, channelName: string, localUid: number) {
-    if (this.isJoined) return;
-    
     this.engine?.joinChannel(token, channelName, localUid, {
       channelProfile: ChannelProfileType.ChannelProfileCommunication,
       clientRoleType: ClientRoleType.ClientRoleBroadcaster,
@@ -90,8 +85,6 @@ class VekycService {
    */
   leaveChannel() {
     this.engine?.leaveChannel();
-    this.isJoined = false;
-    this.remoteUid = 0;
   }
 
   /**
