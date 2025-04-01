@@ -18,8 +18,8 @@ import {
 class VekycService {
   private engine?: IRtcEngine;
   private eventHandler?: IRtcEngineEventHandler;
-  private remoteUid: number = 0;
-  private isJoined: boolean = false;
+  private _isJoined: boolean = false;
+  private _remoteUid: number = 0;
 
   /**
    * Creates an instance of VekycService.
@@ -45,21 +45,31 @@ class VekycService {
 
   /**
    * Registers event handlers for callbacks.
-   * @param onUserJoined - Callback invoked when a remote user joins the channel.
-   * @param onUserOffline - Callback invoked when a remote user leaves the channel.
+   * 
+   * This function allows you to handle key events during the video call lifecycle, such as when the user successfully joins a channel, 
+   * when a remote user joins, or when a remote user leaves the channel.
+   * 
+   * @param onJoinChannelSuccess - Callback invoked when the local user successfully joins the channel.
+   * @param onUserJoined - Callback invoked when a remote user joins the channel. Receives the UID of the remote user.
+   * @param onUserOffline - Callback invoked when a remote user leaves the channel. Receives the UID of the remote user.
    */
-  registerEventHandler(onUserJoined: (uid: number) => void, onUserOffline: (uid: number) => void) {
+  registerEventHandler(
+    onJoinChannelSuccess: () => void,
+    onUserJoined: (uid: number) => void,
+    onUserOffline: (uid: number) => void
+  ) {
     this.eventHandler = {
       onJoinChannelSuccess: () => {
-        this.isJoined = true;
+        this._isJoined = true;
+        onJoinChannelSuccess();
       },
       onUserJoined: (_connection: RtcConnection, uid: number) => {
-        this.remoteUid = uid;
+        this._remoteUid = uid;
         onUserJoined(uid);
       },
       onUserOffline: (_connection: RtcConnection, uid: number) => {
-        if (this.remoteUid === uid) {
-          this.remoteUid = 0;
+        if (this._remoteUid === uid) {
+          this._remoteUid = 0;
         }
         onUserOffline(uid);
       },
@@ -75,7 +85,7 @@ class VekycService {
    * @throws Will throw an error if the user is already joined or the engine is not initialized.
    */
   async joinChannel(token: string, channelName: string, localUid: number) {
-    if (this.isJoined) return;
+    if (this._isJoined) return;
     
     this.engine?.joinChannel(token, channelName, localUid, {
       channelProfile: ChannelProfileType.ChannelProfileCommunication,
@@ -100,7 +110,18 @@ class VekycService {
    * @returns A boolean indicating the joined state.
    */
   getIsJoined(): boolean {
-    return this.isJoined;
+    return this._isJoined;
+  }
+
+  /**
+   * Retrieves the UID of the remote user currently connected to the channel.
+   * 
+   * This function returns the UID of the remote user if one is connected. If no remote user is connected, it returns `0`.
+   * 
+   * @returns The UID of the remote user or `0` if no remote user is connected.
+   */
+  getRemoteUid(): number {
+    return this._remoteUid;
   }
 
   /**
@@ -109,8 +130,8 @@ class VekycService {
    */
   leaveChannel() {
     this.engine?.leaveChannel();
-    this.isJoined = false;
-    this.remoteUid = 0;
+    this._isJoined = false;
+    this._remoteUid = 0;
   }
 
   /**

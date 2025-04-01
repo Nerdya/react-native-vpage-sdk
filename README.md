@@ -128,16 +128,16 @@ export default VideoComponent;
 
 ### VEKYC
 
-| Function                                            | Description                                                             |
-|-----------------------------------------------------|-------------------------------------------------------------------------|
-| `initialize()`                                      | Initializes the engine and requests necessary permissions (on Android). |
-| `registerEventHandler(onUserJoined, onUserOffline)` | Registers event handlers for user join and leave callbacks.             |
-| `joinChannel(token, channelName, localUid)`         | Joins a channel as a host.                                              |
-| `enableVideo()`                                     | Enables video and starts the local video preview.                       |
-| `getIsJoined()`                                     | Checks if the user is currently joined in a channel.                    |
-| `leaveChannel()`                                    | Leaves the current channel and resets the internal state.               |
-| `cleanup()`                                         | Cleans up the engine, stops the video preview, and releases resources.  |
-| `RtcSurfaceView`                                    | A React Native component for rendering local or remote video streams.   |
+| Function                                                                  | Description                                                                                    |
+|---------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| `initialize()`                                                            | Initializes the engine and requests necessary permissions (on Android).                        |
+| `registerEventHandler(onJoinChannelSuccess, onUserJoined, onUserOffline)` | Registers event handlers for successful channel join, remote user join, and remote user leave. |
+| `joinChannel(token, channelName, localUid)`                               | Joins a channel as a host.                                                                     |
+| `enableVideo()`                                                           | Enables video and starts the local video preview.                                              |
+| `getIsJoined()`                                                           | Checks if the user is currently joined in a channel.                                           |
+| `leaveChannel()`                                                          | Leaves the current channel and resets the internal state.                                      |
+| `cleanup()`                                                               | Cleans up the engine, stops the video preview, and releases resources.                         |
+| `RtcSurfaceView`                                                          | A React Native component for rendering local or remote video streams.                          |
 
 ## Demo
 
