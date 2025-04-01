@@ -6,6 +6,8 @@ import {
   RtcConnection,
   IRtcEngineEventHandler,
   createAgoraRtcEngine,
+  RtcSurfaceView,
+  VideoSourceType,
 } from 'react-native-agora';
 
 /**
@@ -66,21 +68,20 @@ class VekycService {
   }
 
   /**
-   * Joins a channel as a host or audience.
+   * Joins a channel as a host.
    * @param token - The token for authentication.
    * @param channelName - The name of the channel to join.
    * @param localUid - The UID of the local user.
-   * @param isHost - Whether the user is a host (`true`) or an audience (`false`).
    * @throws Will throw an error if the user is already joined or the engine is not initialized.
    */
-  async joinChannel(token: string, channelName: string, localUid: number, isHost: boolean) {
+  async joinChannel(token: string, channelName: string, localUid: number) {
     if (this.isJoined) return;
     
     this.engine?.joinChannel(token, channelName, localUid, {
       channelProfile: ChannelProfileType.ChannelProfileCommunication,
-      clientRoleType: isHost ? ClientRoleType.ClientRoleBroadcaster : ClientRoleType.ClientRoleAudience,
-      publishMicrophoneTrack: isHost,
-      publishCameraTrack: isHost,
+      clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+      publishMicrophoneTrack: true,
+      publishCameraTrack: true,
       autoSubscribeAudio: true,
       autoSubscribeVideo: true,
     });
@@ -125,3 +126,6 @@ class VekycService {
 export function createVekycService(appId: string) {
   return new VekycService(appId);
 }
+
+// Export RtcSurfaceView for rendering video streams
+export { RtcSurfaceView, VideoSourceType };
