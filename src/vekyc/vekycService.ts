@@ -88,6 +88,22 @@ class VekycService {
   }
 
   /**
+   * Enables video and starts the local video preview.
+   */
+  enableVideo() {
+    this.engine?.enableVideo();
+    this.engine?.startPreview();
+  }
+
+  /**
+   * Checks if the user is currently joined in a channel.
+   * @returns A boolean indicating the joined state.
+   */
+  getIsJoined(): boolean {
+    return this.isJoined;
+  }
+
+  /**
    * Leaves the current channel.
    * Resets the internal state (`isJoined` and `remoteUid`).
    */
@@ -95,14 +111,6 @@ class VekycService {
     this.engine?.leaveChannel();
     this.isJoined = false;
     this.remoteUid = 0;
-  }
-
-  /**
-   * Enables video and starts the local video preview.
-   */
-  enableVideo() {
-    this.engine?.enableVideo();
-    this.engine?.startPreview();
   }
 
   /**

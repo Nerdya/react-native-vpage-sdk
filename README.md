@@ -36,6 +36,8 @@ pod install
 
 ## Example Usage
 
+### Initialize
+
 ```typescript
 import { createVekycService, RtcSurfaceView } from 'react-native-vpage-sdk';
 
@@ -45,37 +47,66 @@ const initialize = async () => {
   await vekycService.initialize();
 
   vekycService.registerEventHandler(
+    () => console.log(`Successfully joined channel`),
     (uid) => console.log(`User ${uid} joined`),
     (uid) => console.log(`User ${uid} left`)
   );
 
-  await vekycService.joinChannel('YOUR_TOKEN', 'YOUR_CHANNEL_NAME', 12345, true);
+  await vekycService.joinChannel('YOUR_TOKEN', 'YOUR_CHANNEL_NAME', 12345);
   vekycService.enableVideo();
 };
+```
 
-// To leave the channel and clean up
+### Leave the channel and clean up
+
+```typescript
 const leave = () => {
   vekycService.leaveChannel();
   vekycService.cleanup();
 };
+```
 
-// Render local video
-<RtcSurfaceView
-  canvas={{
-    uid: 12345,
-    sourceType: 0, // VideoSourceType.VideoSourceCamera
-  }}
-  style={{ width: '100%', height: 200 }}
-/>;
+### Render local and remote video
 
-// Render remote video
-<RtcSurfaceView
-  canvas={{
-    uid: 67890,
-    sourceType: 1, // VideoSourceType.VideoSourceRemote
-  }}
-  style={{ width: '100%', height: 200 }}
-/>;
+You can use the `getIsJoined` function to check if the user has joined a channel before rendering the video components.
+
+```typescript
+import React from 'react';
+import { View, Text } from 'react-native';
+import { createVekycService, RtcSurfaceView } from 'react-native-vpage-sdk';
+
+const vekycService = createVekycService('YOUR_APP_ID');
+...
+const VideoComponent = () => {
+  const isJoined = vekycService.getIsJoined();
+
+  return (
+    <View>
+      {isJoined && (
+        <>
+          <Text>Local Video:</Text>
+          <RtcSurfaceView
+            canvas={{
+              uid: 12345,
+              sourceType: 0, // VideoSourceType.VideoSourceCamera
+            }}
+            style={{ width: '100%', height: 200 }}
+          />
+          <Text>Remote Video:</Text>
+          <RtcSurfaceView
+            canvas={{
+              uid: 67890,
+              sourceType: 1, // VideoSourceType.VideoSourceRemote
+            }}
+            style={{ width: '100%', height: 200 }}
+          />
+        </>
+      )}
+    </View>
+  );
+};
+
+export default VideoComponent;
 ```
 
 ## Available Functions
@@ -102,8 +133,9 @@ const leave = () => {
 | `initialize()`                                      | Initializes the engine and requests necessary permissions (on Android). |
 | `registerEventHandler(onUserJoined, onUserOffline)` | Registers event handlers for user join and leave callbacks.             |
 | `joinChannel(token, channelName, localUid)`         | Joins a channel as a host.                                              |
-| `leaveChannel()`                                    | Leaves the current channel and resets the internal state.               |
 | `enableVideo()`                                     | Enables video and starts the local video preview.                       |
+| `getIsJoined()`                                     | Checks if the user is currently joined in a channel.                    |
+| `leaveChannel()`                                    | Leaves the current channel and resets the internal state.               |
 | `cleanup()`                                         | Cleans up the engine, stops the video preview, and releases resources.  |
 | `RtcSurfaceView`                                    | A React Native component for rendering local or remote video streams.   |
 
