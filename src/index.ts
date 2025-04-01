@@ -1,2 +1,2 @@
-export * from './agora';
 export * from './api';
+export * from './vekyc';

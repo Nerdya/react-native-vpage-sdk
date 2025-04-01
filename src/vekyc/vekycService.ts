@@ -1,0 +1,127 @@
+import { PermissionsAndroid, Platform } from 'react-native';
+import {
+  ChannelProfileType,
+  ClientRoleType,
+  IRtcEngine,
+  RtcConnection,
+  IRtcEngineEventHandler,
+  createAgoraRtcEngine,
+} from 'react-native-agora';
+
+/**
+ * VekycService provides an abstraction for managing video calls.
+ * It encapsulates SDK functionality such as initialization, joining/leaving channels,
+ * handling events, and managing video streams.
+ */
+class VekycService {
+  private engine?: IRtcEngine;
+  private eventHandler?: IRtcEngineEventHandler;
+  private remoteUid: number = 0;
+  private isJoined: boolean = false;
+
+  /**
+   * Creates an instance of VekycService.
+   * @param appId - The App ID used to initialize the engine.
+   */
+  constructor(private appId: string) {}
+
+  /**
+   * Initializes the engine and requests necessary permissions (on Android).
+   * @throws Will throw an error if permissions are denied or initialization fails.
+   */
+  async initialize() {
+    if (Platform.OS === 'android') {
+      await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+      ]);
+    }
+    
+    this.engine = createAgoraRtcEngine();
+    await this.engine.initialize({ appId: this.appId });
+  }
+
+  /**
+   * Registers event handlers for callbacks.
+   * @param onUserJoined - Callback invoked when a remote user joins the channel.
+   * @param onUserOffline - Callback invoked when a remote user leaves the channel.
+   */
+  registerEventHandler(onUserJoined: (uid: number) => void, onUserOffline: (uid: number) => void) {
+    this.eventHandler = {
+      onJoinChannelSuccess: () => {
+        this.isJoined = true;
+      },
+      onUserJoined: (_connection: RtcConnection, uid: number) => {
+        this.remoteUid = uid;
+        onUserJoined(uid);
+      },
+      onUserOffline: (_connection: RtcConnection, uid: number) => {
+        if (this.remoteUid === uid) {
+          this.remoteUid = 0;
+        }
+        onUserOffline(uid);
+      },
+    };
+    this.engine?.registerEventHandler(this.eventHandler);
+  }
+
+  /**
+   * Joins a channel as a host or audience.
+   * @param token - The token for authentication.
+   * @param channelName - The name of the channel to join.
+   * @param localUid - The UID of the local user.
+   * @param isHost - Whether the user is a host (`true`) or an audience (`false`).
+   * @throws Will throw an error if the user is already joined or the engine is not initialized.
+   */
+  async joinChannel(token: string, channelName: string, localUid: number, isHost: boolean) {
+    if (this.isJoined) return;
+    
+    this.engine?.joinChannel(token, channelName, localUid, {
+      channelProfile: ChannelProfileType.ChannelProfileCommunication,
+      clientRoleType: isHost ? ClientRoleType.ClientRoleBroadcaster : ClientRoleType.ClientRoleAudience,
+      publishMicrophoneTrack: isHost,
+      publishCameraTrack: isHost,
+      autoSubscribeAudio: true,
+      autoSubscribeVideo: true,
+    });
+  }
+
+  /**
+   * Leaves the current channel.
+   * Resets the internal state (`isJoined` and `remoteUid`).
+   */
+  leaveChannel() {
+    this.engine?.leaveChannel();
+    this.isJoined = false;
+    this.remoteUid = 0;
+  }
+
+  /**
+   * Enables video and starts the local video preview.
+   */
+  enableVideo() {
+    this.engine?.enableVideo();
+    this.engine?.startPreview();
+  }
+
+  /**
+   * Cleans up the engine and releases resources.
+   * Ensures the channel is left, video preview is stopped, and the engine is released.
+   */
+  cleanup() {
+    this.leaveChannel();
+    this.engine?.stopPreview();
+    this.engine?.unregisterEventHandler(this.eventHandler!);
+    this.engine?.release();
+    this.engine = undefined;
+  }
+}
+
+/**
+ * Factory function to create an instance of VekycService.
+ * @param appId - The App ID used to initialize the engine.
+ * @returns A new instance of VekycService.
+ */
+export function createVekycService(appId: string) {
+  return new VekycService(appId);
+}

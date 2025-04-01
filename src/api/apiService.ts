@@ -3,14 +3,30 @@ import { createAPIClient } from './apiClient';
 import { ActionHistory, environment } from '../utils/helpers';
 import { APIClientOptions, ApiResponse, CheckSelfKycDto, ConfigDto, EkycSubmitDto, ResendOTPDto, VerifyOTPDto } from '../types';
 
+/**
+ * APIService provides methods to interact with the backend API.
+ * It encapsulates HTTP GET and POST requests and provides higher-level methods
+ * for specific API endpoints such as fetching configuration, creating meetings,
+ * verifying OTPs, and more.
+ */
 class APIService {
   private client: AxiosInstance;
 
+  /**
+   * Creates an instance of APIService.
+   * @param client - An Axios instance for making HTTP requests.
+   */
   constructor(client: AxiosInstance) {
     this.client = client;
   }
 
-  // Wrapper for GET request
+  /**
+   * Sends a GET request to the specified endpoint with optional query parameters.
+   * @param endpoint - The API endpoint to send the GET request to.
+   * @param params - (Optional) Query parameters for the request.
+   * @returns A promise resolving to the response data.
+   * @throws An error if the request fails.
+   */
   private async get(endpoint: string, params?: Record<string, any>) {
     try {
       const res = await this.client.get(endpoint, { params });
@@ -21,6 +37,14 @@ class APIService {
     }
   }
 
+  /**
+   * Sends a GET request to an endpoint with dynamic path parameters.
+   * @param endpoint - The API endpoint with placeholders for dynamic parameters.
+   * @param ids - An object containing the dynamic parameters to replace in the endpoint.
+   * @param params - (Optional) Query parameters for the request.
+   * @returns A promise resolving to the response data.
+   * @throws An error if the request fails.
+   */
   private async getNested(endpoint: string, ids: Record<string, any>, params?: Record<string, any>) {
     const keys = Object.keys(ids);
     for (const key of keys) {
@@ -31,7 +55,13 @@ class APIService {
     return this.get(endpoint, params);
   }
 
-  // Wrapper for POST request
+  /**
+   * Sends a POST request to the specified endpoint with optional payload data.
+   * @param endpoint - The API endpoint to send the POST request to.
+   * @param data - (Optional) The payload data for the request.
+   * @returns A promise resolving to the response data.
+   * @throws An error if the request fails.
+   */
   private async post(endpoint: string, data?: Record<string, any>) {
     try {
       const res = await this.client.post(endpoint, data);
@@ -42,6 +72,14 @@ class APIService {
     }
   }
 
+  /**
+   * Sends a POST request to an endpoint with dynamic path parameters.
+   * @param endpoint - The API endpoint with placeholders for dynamic parameters.
+   * @param ids - An object containing the dynamic parameters to replace in the endpoint.
+   * @param data - (Optional) The payload data for the request.
+   * @returns A promise resolving to the response data.
+   * @throws An error if the request fails.
+   */
   private async postChildren(endpoint: string, ids: Record<string, any>, data?: Record<string, any>) {
     const keys = Object.keys(ids);
     for (const key of keys) {
@@ -53,6 +91,13 @@ class APIService {
   }
 
   // API methods
+
+  /**
+   * Fetches configuration information for a given appointment.
+   * @param appointmentId - The ID of the appointment.
+   * @returns A promise resolving to the configuration information.
+   * @throws An error if the request fails.
+   */
   async getConfigInfo(appointmentId: string) {
     try {
       const params = { appointment_id: appointmentId };
@@ -64,6 +109,13 @@ class APIService {
     }
   }
 
+  /**
+   * Creates a meeting for a given appointment.
+   * @param appointmentId - The ID of the appointment.
+   * @param agentId - (Optional) The ID of the agent.
+   * @returns A promise resolving to the meeting creation response.
+   * @throws An error if the request fails.
+   */
   async createMeeting(appointmentId: string, agentId = null) {
     try {
       const ids = { id: appointmentId };
@@ -76,6 +128,14 @@ class APIService {
     }
   }
 
+  /**
+   * Saves a log entry with action history and optional details.
+   * @param actionHistory - The action history object.
+   * @param detail - (Optional) Additional details for the log.
+   * @param sessionKey - (Optional) The session key.
+   * @returns A promise resolving to the log save response.
+   * @throws An error if the request fails.
+   */
   async saveLog(actionHistory: ActionHistory, detail = null, sessionKey = null) {
     try {
       const payload = { actionHistory, detail, sessionKey };
@@ -87,17 +147,13 @@ class APIService {
     }
   }
 
-  // async verifyCaptcha(secret: string, captchaToken: string) {
-  //   try {
-  //     const payload = { secret, response: captchaToken };
-  //     const res = await this.post(environment.VERIFY_CAPTCHA, payload);
-  //     return res as ApiResponse<any>;
-  //   } catch (error) {
-  //     console.error('Error verifying captcha:', error);
-  //     throw error;
-  //   }
-  // }
-
+  /**
+   * Submits data for a given appointment.
+   * @param appointmentId - The ID of the appointment.
+   * @param agentId - (Optional) The ID of the agent.
+   * @returns A promise resolving to the submission response.
+   * @throws An error if the request fails.
+   */
   async submit(appointmentId: string, agentId = null) {
     try {
       const payload = { id: appointmentId, agent_id: agentId };
@@ -109,6 +165,13 @@ class APIService {
     }
   }
 
+  /**
+   * Verifies an OTP for a given appointment.
+   * @param appointmentId - The ID of the appointment.
+   * @param otp - The OTP to verify.
+   * @returns A promise resolving to the OTP verification response.
+   * @throws An error if the request fails.
+   */
   async verifyOTP(appointmentId: string, otp: string) {
     try {
       const payload = { uuid: appointmentId, appointmentId, otp };
@@ -120,6 +183,12 @@ class APIService {
     }
   }
 
+  /**
+   * Resends an OTP for a given appointment.
+   * @param appointmentId - The ID of the appointment.
+   * @returns A promise resolving to the OTP resend response.
+   * @throws An error if the request fails.
+   */
   async resendOTP(appointmentId: string) {
     try {
       const payload = { uuid: appointmentId };
@@ -131,6 +200,12 @@ class APIService {
     }
   }
 
+  /**
+   * Checks the self-KYC status for a given session key.
+   * @param sessionKey - The session key.
+   * @returns A promise resolving to the self-KYC status.
+   * @throws An error if the request fails.
+   */
   async checkSelfKYC(sessionKey: string) {
     try {
       const params = { sessionKey };
@@ -142,6 +217,14 @@ class APIService {
     }
   }
 
+  /**
+   * Hooks a session with the given session ID, session key, and optional agent ID.
+   * @param sessionId - The session ID.
+   * @param sessionKey - The session key.
+   * @param agentId - (Optional) The ID of the agent.
+   * @returns A promise resolving to the hook response.
+   * @throws An error if the request fails.
+   */
   async hook(sessionId: string, sessionKey: string, agentId = null) {
     try {
       const payload = { sessionId, sessionKey, agentId };
@@ -153,6 +236,12 @@ class APIService {
     }
   }
 
+  /**
+   * Closes a video session for a given session key.
+   * @param sessionKey - The session key.
+   * @returns A promise resolving to the video close response.
+   * @throws An error if the request fails.
+   */
   async closeVideo(sessionKey: string) {
     try {
       const payload = { sessionKey, type: 'USER' };
@@ -164,6 +253,15 @@ class APIService {
     }
   }
 
+  /**
+   * Rates a call and provides feedback for both the call and the agent.
+   * @param callRating - The rating for the video call.
+   * @param callFeedback - The feedback for the video call.
+   * @param agentRating - The rating for the agent.
+   * @param agentFeedback - The feedback for the agent.
+   * @returns A promise resolving to the rating response.
+   * @throws An error if the request fails.
+   */
   async rateCall(callRating: number, callFeedback: string, agentRating: number, agentFeedback: string) {
     try {
       const payload = {
@@ -181,7 +279,11 @@ class APIService {
   }
 }
 
-// Export a function to create an API service instance
+/**
+ * Factory function to create an instance of APIService.
+ * @param options - (Optional) Configuration options for the Axios client.
+ * @returns A new instance of APIService.
+ */
 export function createAPIService(options?: APIClientOptions) {
   const client = createAPIClient(options);
   return new APIService(client);
