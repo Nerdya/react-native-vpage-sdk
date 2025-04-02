@@ -1,4 +1,3 @@
-import { NetworkInfo } from 'react-native-network-info';
 import { AxiosInstance } from 'axios';
 import { createAPIClient } from './apiClient';
 import { ActionHistory, environment } from '../utils/helpers';
@@ -12,7 +11,6 @@ import { APIClientOptions, ApiResponse, CheckSelfKycDto, ConfigDto, CreateMeetin
  */
 class APIService {
   private client: AxiosInstance;
-  private ip: string | null = null;
 
   /**
    * Creates an instance of APIService.
@@ -20,19 +18,6 @@ class APIService {
    */
   constructor(client: AxiosInstance) {
     this.client = client;
-    this.setIPAddress();
-  }
-
-  /**
-   * Fetches the current IPv4 address.
-   */
-  private async setIPAddress() {
-    try {
-      this.ip = await NetworkInfo.getIPAddress(); // Fetch the device's IPv4 address
-    } catch (error) {
-      console.error('Error fetching IP address:', error);
-      this.ip = null; // Set to null if fetching the IP address fails
-    }
   }
 
   /**
@@ -131,10 +116,10 @@ class APIService {
    * @returns A promise resolving to the meeting creation response.
    * @throws An error if the request fails.
    */
-  async createMeeting(appointmentId: string, agentId = null) {
+  async createMeeting(appointmentId: string, customerIp: string, agentId = null) {
     try {
       const ids = { id: appointmentId };
-      const payload: any = { customerIp: this.ip, agent_id: agentId };
+      const payload: any = { customerIp, agent_id: agentId };
       const res = await this.postChildren(environment.CREATE_MEETING, ids, payload);
       return res as ApiResponse<CreateMeetingDto>;
     } catch (error) {
