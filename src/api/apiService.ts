@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { createAPIClient } from './apiClient';
 import { ActionHistory, environment } from '../utils/helpers';
-import { APIClientOptions, ApiResponse, CheckSelfKycDto, ConfigDto, EkycSubmitDto, ResendOTPDto, VerifyOTPDto } from '../types';
+import { APIClientOptions, ApiResponse, CheckSelfKycDto, ConfigDto, CreateMeetingDto, SubmitDto } from '../types';
 
 /**
  * APIService provides methods to interact with the backend API.
@@ -121,7 +121,7 @@ class APIService {
       const ids = { id: appointmentId };
       const payload = { agent_id: agentId };
       const res = await this.postChildren(environment.CREATE_MEETING, ids, payload);
-      return res as ApiResponse<any>;
+      return res as ApiResponse<CreateMeetingDto>;
     } catch (error) {
       console.error('Error creating meeting:', error);
       throw error;
@@ -158,7 +158,7 @@ class APIService {
     try {
       const payload = { id: appointmentId, agent_id: agentId };
       const res = await this.post(environment.SUBMIT, payload);
-      return res as ApiResponse<EkycSubmitDto>;
+      return res as ApiResponse<SubmitDto>;
     } catch (error) {
       console.error('Error submitting:', error);
       throw error;
@@ -172,16 +172,16 @@ class APIService {
    * @returns A promise resolving to the OTP verification response.
    * @throws An error if the request fails.
    */
-  async verifyOTP(appointmentId: string, otp: string) {
-    try {
-      const payload = { uuid: appointmentId, appointmentId, otp };
-      const res = await this.post(environment.VERIFY_OTP, payload);
-      return res as ApiResponse<VerifyOTPDto>;
-    } catch (error) {
-      console.error('Error verifying OTP:', error);
-      throw error;
-    }
-  }
+  // async verifyOTP(appointmentId: string, otp: string) {
+  //   try {
+  //     const payload = { uuid: appointmentId, appointmentId, otp };
+  //     const res = await this.post(environment.VERIFY_OTP, payload);
+  //     return res as ApiResponse<VerifyOTPDto>;
+  //   } catch (error) {
+  //     console.error('Error verifying OTP:', error);
+  //     throw error;
+  //   }
+  // }
 
   /**
    * Resends an OTP for a given appointment.
@@ -189,16 +189,16 @@ class APIService {
    * @returns A promise resolving to the OTP resend response.
    * @throws An error if the request fails.
    */
-  async resendOTP(appointmentId: string) {
-    try {
-      const payload = { uuid: appointmentId };
-      const res = await this.post(environment.RESEND_OTP, payload);
-      return res as ApiResponse<ResendOTPDto>;
-    } catch (error) {
-      console.error('Error resending OTP:', error);
-      throw error;
-    }
-  }
+  // async resendOTP(appointmentId: string) {
+  //   try {
+  //     const payload = { uuid: appointmentId };
+  //     const res = await this.post(environment.RESEND_OTP, payload);
+  //     return res as ApiResponse<ResendOTPDto>;
+  //   } catch (error) {
+  //     console.error('Error resending OTP:', error);
+  //     throw error;
+  //   }
+  // }
 
   /**
    * Checks the self-KYC status for a given session key.

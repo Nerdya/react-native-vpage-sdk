@@ -1,4 +1,4 @@
-export type EkycSubmitDto = {
+export type SubmitDto = {
   currentTime: number;
   expiredTime: number;
   numberLimit: number;

@@ -57,12 +57,10 @@ const VideoComponent = () => {
           setIsJoined(true);
         },
         onUserJoined: (_connection, uid) => {
-          setRemoteUid(uid);
+          setRemoteUid(() => uid);
         },
         onUserOffline: (_connection, uid) => {
-          if (remoteUid === uid) {
-            setRemoteUid(0);
-          }
+          setRemoteUid((prevUid) => prevUid === uid ? 0 : prevUid);
         }
       });
     
@@ -104,7 +102,7 @@ const VideoComponent = () => {
             />
 
             {/* Render remote video */}
-            {remoteUid !== 0 ? (
+            {remoteUid ? (
               <React.Fragment>
                 <Text>Remote user uid: {remoteUid}</Text>
                 <RtcSurfaceView
@@ -153,8 +151,6 @@ const styles = StyleSheet.create({
 | `createMeeting(appointmentId, agentId?)`                         | Initiates an eKYC meeting for the given appointment and optional agent. |
 | `saveLog(actionHistory, detail?, sessionKey?)`                   | Logs an action with optional details and session key for tracking.      |
 | `submit(appointmentId, agentId?)`                                | Submits eKYC data for the specified appointment and optional agent.     |
-| `verifyOTP(appointmentId, otp)`                                  | Confirms an OTP for the given appointment.                              |
-| `resendOTP(appointmentId)`                                       | Sends a new OTP for the specified appointment.                          |
 | `checkSelfKYC(sessionKey)`                                       | Verifies if the session is eligible for self-KYC.                       |
 | `hook(sessionId, sessionKey, agentId?)`                          | Creates a hook for the specified session and optional agent.            |
 | `closeVideo(sessionKey)`                                         | Ends the video session for the provided session key.                    |
