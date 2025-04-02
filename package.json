@@ -13,8 +13,7 @@
     "axios": "^1.8.4",
     "react": "^19.0.0",
     "react-native": "^0.78.1",
-    "react-native-agora": "^4.5.2",
-    "react-native-network-info": "^5.2.1"
+    "react-native-agora": "^4.5.2"
   },
   "devDependencies": {
     "@types/react": "^19.0.12",
