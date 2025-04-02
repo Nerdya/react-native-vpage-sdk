@@ -30,7 +30,7 @@ class APIService {
   private async get(endpoint: string, params?: Record<string, any>) {
     try {
       const res = await this.client.get(endpoint, { params });
-      return res as unknown;
+      return res.data as unknown;
     } catch (error) {
       console.error(`GET ${endpoint} failed:`, error);
       throw error;
@@ -65,7 +65,7 @@ class APIService {
   private async post(endpoint: string, data?: Record<string, any>) {
     try {
       const res = await this.client.post(endpoint, data);
-      return res as unknown;
+      return res.data as unknown;
     } catch (error) {
       console.error(`POST ${endpoint} failed:`, error);
       throw error;
@@ -119,9 +119,8 @@ class APIService {
   async createMeeting(appointmentId: string, agentId = null) {
     try {
       const ids = { id: appointmentId };
-      const payload: any = {};
-      agentId && (payload['agent_id'] = agentId);
-      const res = await this.postChildren(environment.CREATE_MEETING, ids, Object.keys(payload).length > 0 ? payload : undefined);
+      const payload: any = { agent_id: agentId };
+      const res = await this.postChildren(environment.CREATE_MEETING, ids, payload);
       return res as ApiResponse<CreateMeetingDto>;
     } catch (error) {
       console.error('Error creating meeting:', error);
@@ -157,8 +156,7 @@ class APIService {
    */
   async submit(appointmentId: string, agentId = null) {
     try {
-      const payload: any = { id: appointmentId };
-      agentId && (payload['agent_id'] = agentId);
+      const payload: any = { id: appointmentId, agent_id: agentId };
       const res = await this.post(environment.SUBMIT, payload);
       return res as ApiResponse<SubmitDto>;
     } catch (error) {
@@ -229,8 +227,7 @@ class APIService {
    */
   async hook(sessionId: string, sessionKey: string, agentId = null) {
     try {
-      const payload: any = { sessionId, sessionKey };
-      agentId && (payload['agent_id'] = agentId);
+      const payload: any = { sessionId, sessionKey, agentId };
       const res = await this.post(environment.HOOK, payload);
       return res as ApiResponse<any>;
     } catch (error) {
