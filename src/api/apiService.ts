@@ -1,3 +1,4 @@
+import { networkInterfaces } from 'os';
 import { AxiosInstance } from 'axios';
 import { createAPIClient } from './apiClient';
 import { ActionHistory, environment } from '../utils/helpers';
@@ -11,6 +12,7 @@ import { APIClientOptions, ApiResponse, CheckSelfKycDto, ConfigDto, CreateMeetin
  */
 class APIService {
   private client: AxiosInstance;
+  private ip: string | null = null;
 
   /**
    * Creates an instance of APIService.
@@ -18,6 +20,24 @@ class APIService {
    */
   constructor(client: AxiosInstance) {
     this.client = client;
+    this.setIPAddress();
+  }
+
+  /**
+   * Fetches the current IPv4 address.
+   */
+  private setIPAddress() {
+    const nets = networkInterfaces();
+    for (const name of Object.keys(nets)) {
+      for (const net of nets[name] || []) {
+        // Check for IPv4 and ensure it's not an internal (loopback) address
+        if (net.family === 'IPv4' && !net.internal) {
+          this.ip = net.address;
+          return; // Exit once the first valid IPv4 address is found
+        }
+      }
+    }
+    this.ip = null; // Set to null if no valid IPv4 address is found
   }
 
   /**
@@ -119,7 +139,7 @@ class APIService {
   async createMeeting(appointmentId: string, agentId = null) {
     try {
       const ids = { id: appointmentId };
-      const payload: any = { agent_id: agentId };
+      const payload: any = { customerIp: this.ip, agent_id: agentId };
       const res = await this.postChildren(environment.CREATE_MEETING, ids, payload);
       return res as ApiResponse<CreateMeetingDto>;
     } catch (error) {
