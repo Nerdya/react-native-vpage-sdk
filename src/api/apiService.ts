@@ -1,4 +1,4 @@
-import { networkInterfaces } from 'os';
+import { NetworkInfo } from 'react-native-network-info';
 import { AxiosInstance } from 'axios';
 import { createAPIClient } from './apiClient';
 import { ActionHistory, environment } from '../utils/helpers';
@@ -26,18 +26,13 @@ class APIService {
   /**
    * Fetches the current IPv4 address.
    */
-  private setIPAddress() {
-    const nets = networkInterfaces();
-    for (const name of Object.keys(nets)) {
-      for (const net of nets[name] || []) {
-        // Check for IPv4 and ensure it's not an internal (loopback) address
-        if (net.family === 'IPv4' && !net.internal) {
-          this.ip = net.address;
-          return; // Exit once the first valid IPv4 address is found
-        }
-      }
+  private async setIPAddress() {
+    try {
+      this.ip = await NetworkInfo.getIPAddress(); // Fetch the device's IPv4 address
+    } catch (error) {
+      console.error('Error fetching IP address:', error);
+      this.ip = null; // Set to null if fetching the IP address fails
     }
-    this.ip = null; // Set to null if no valid IPv4 address is found
   }
 
   /**
