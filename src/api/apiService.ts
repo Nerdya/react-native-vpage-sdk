@@ -121,7 +121,7 @@ class APIService {
       const ids = { id: appointmentId };
       const payload: any = {};
       agentId && (payload['agent_id'] = agentId);
-      const res = await this.postChildren(environment.CREATE_MEETING, ids, payload);
+      const res = await this.postChildren(environment.CREATE_MEETING, ids, Object.keys(payload).length > 0 ? payload : undefined);
       return res as ApiResponse<CreateMeetingDto>;
     } catch (error) {
       console.error('Error creating meeting:', error);
