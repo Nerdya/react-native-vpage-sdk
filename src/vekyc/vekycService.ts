@@ -21,12 +21,7 @@ export function createVekycEngine(): IRtcEngine {
 }
 
 class VekycService {
-  private engine: IRtcEngine;
   private eventHandler?: IRtcEngineEventHandler;
-
-  constructor() {
-    this.engine = createAgoraRtcEngine();
-  }
 
   /**
    * Requests necessary permissions for audio and video on Android.
@@ -48,12 +43,13 @@ class VekycService {
 
   /**
    * Initializes the RTC engine with the provided App ID.
+   * @param engine - The RTC engine instance.
    * @param appId - The App ID for the Agora project.
    * @throws Will throw an error if initialization fails.
    */
-  initialize(appId: string) {
+  initialize(engine: IRtcEngine, appId: string) {
     try {
-      return this.engine.initialize({ appId });
+      return engine.initialize({ appId });
     } catch (error) {
       console.error('Failed to initialize the engine:', error);
       throw error;
@@ -62,13 +58,14 @@ class VekycService {
 
   /**
    * Registers event handlers for callbacks.
+   * @param engine - The RTC engine instance.
    * @param eventHandler - An object implementing the IRtcEngineEventHandler interface.
    * @throws Will throw an error if registration fails.
    */
-  registerEventHandler(eventHandler: IRtcEngineEventHandler) {
+  registerEventHandler(engine: IRtcEngine, eventHandler: IRtcEngineEventHandler) {
     try {
       this.eventHandler = eventHandler;
-      this.engine.registerEventHandler(this.eventHandler);
+      engine.registerEventHandler(this.eventHandler);
     } catch (error) {
       console.error('Failed to register event handler:', error);
       throw error;
@@ -77,13 +74,14 @@ class VekycService {
 
   /**
    * Joins a channel as a host.
+   * @param engine - The RTC engine instance.
    * @param token - The token for authentication.
    * @param channelName - The name of the channel to join.
    * @param localUid - The UID of the local user.
    * @param options - Additional channel media options.
    * @throws Will throw an error if the user is already joined or the engine is not initialized.
    */
-  joinChannel(token: string, channelName: string, localUid: number, options: ChannelMediaOptions = {}) {
+  joinChannel(engine: IRtcEngine, token: string, channelName: string, localUid: number, options: ChannelMediaOptions = {}) {
     try {
       const opts: ChannelMediaOptions = {
         channelProfile: ChannelProfileType.ChannelProfileCommunication,
@@ -95,7 +93,7 @@ class VekycService {
         ...options,
       };
 
-      return this.engine.joinChannel(token, channelName, localUid, opts);
+      return engine.joinChannel(token, channelName, localUid, opts);
     } catch (error) {
       console.error('Failed to join the channel:', error);
       throw error;
@@ -104,11 +102,12 @@ class VekycService {
 
   /**
    * Enables video for the RTC engine.
+   * @param engine - The RTC engine instance.
    * @throws Will throw an error if enabling video fails.
    */
-  enableVideo() {
+  enableVideo(engine: IRtcEngine) {
     try {
-      return this.engine.enableVideo();
+      return engine.enableVideo();
     } catch (error) {
       console.error('Failed to enable video:', error);
       throw error;
@@ -117,11 +116,12 @@ class VekycService {
 
   /**
    * Starts the local video preview.
+   * @param engine - The RTC engine instance.
    * @throws Will throw an error if starting the preview fails.
    */
-  startPreview() {
+  startPreview(engine: IRtcEngine) {
     try {
-      return this.engine.startPreview();
+      return engine.startPreview();
     } catch (error) {
       console.error('Failed to start preview:', error);
       throw error;
@@ -130,11 +130,12 @@ class VekycService {
 
   /**
    * Stops the local video preview.
+   * @param engine - The RTC engine instance.
    * @throws Will throw an error if stopping the preview fails.
    */
-  stopPreview() {
+  stopPreview(engine: IRtcEngine) {
     try {
-      return this.engine.stopPreview();
+      return engine.stopPreview();
     } catch (error) {
       console.error('Failed to stop preview:', error);
       throw error;
@@ -143,11 +144,12 @@ class VekycService {
 
   /**
    * Leaves the current channel.
+   * @param engine - The RTC engine instance.
    * @throws Will throw an error if leaving the channel fails.
    */
-  leaveChannel() {
+  leaveChannel(engine: IRtcEngine) {
     try {
-      return this.engine.leaveChannel();
+      return engine.leaveChannel();
     } catch (error) {
       console.error('Failed to leave the channel:', error);
       throw error;
@@ -156,15 +158,16 @@ class VekycService {
 
   /**
    * Unregisters the event handler from the RTC engine.
+   * @param engine - The RTC engine instance.
    * @returns A boolean indicating whether the event handler was unregistered.
    * @throws Will throw an error if unregistering fails.
    */
-  unregisterEventHandler() {
+  unregisterEventHandler(engine: IRtcEngine) {
     try {
       if (!this.eventHandler) {
         return false;
       }
-      return this.engine.unregisterEventHandler(this.eventHandler);
+      return engine.unregisterEventHandler(this.eventHandler);
     } catch (error) {
       console.error('Failed to unregister event handler:', error);
       throw error;
@@ -173,14 +176,15 @@ class VekycService {
 
   /**
    * Cleans up the engine and releases resources.
+   * @param engine - The RTC engine instance.
    * @throws Will throw an error if cleanup fails.
    */
-  cleanup() {
+  cleanup(engine: IRtcEngine) {
     try {
-      this.leaveChannel();
-      this.stopPreview();
-      this.unregisterEventHandler();
-      this.engine.release();
+      this.leaveChannel(engine);
+      this.stopPreview(engine);
+      this.unregisterEventHandler(engine);
+      engine.release();
     } catch (error) {
       console.error('Failed to clean up the engine:', error);
       throw error;
