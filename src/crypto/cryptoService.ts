@@ -52,14 +52,20 @@ export class CryptoService {
   }
 
   /**
-   * Decrypts the token from a given URL and extracts the appointment ID and decrypted token.
+   * Decrypts the token from a given URL and extracts the base URL, appointment ID, and decrypted token.
    * @param url - The URL containing the `appointment_id` and `token_encrypt` parameters.
-   * @returns An object containing the `appointmentId` and decrypted `token`, or `undefined` if decryption fails.
+   * @returns An object containing the `baseUrl`, `appointmentId`, and decrypted `token`, or `undefined` if decryption fails.
    */
   decryptWS6Url(url: string) {
     try {
-      // Parse the URL to extract query parameters
-      const urlParams = new URLSearchParams(url.split('?')[1]);
+      // Extract the base URL (everything before the query parameters)
+      const [baseUrl, queryString] = url.split('?');
+      if (!queryString) {
+        throw new Error('Invalid URL: Missing query parameters');
+      }
+
+      // Parse the query parameters
+      const urlParams = new URLSearchParams(queryString);
       const appointmentId = urlParams.get('appointment_id');
       const encryptedToken = urlParams.get('token_encrypt');
 
@@ -74,8 +80,8 @@ export class CryptoService {
         throw new Error('Failed to decrypt the token');
       }
 
-      // Return the appointment ID and decrypted token
-      return { appointmentId, token: decryptedToken };
+      // Return the base URL, appointment ID, and decrypted token
+      return { baseUrl, appointmentId, token: decryptedToken };
     } catch (error) {
       console.error('Error decrypting WS6 URL:', error);
       return undefined;

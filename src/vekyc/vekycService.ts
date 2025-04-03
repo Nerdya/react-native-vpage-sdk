@@ -47,13 +47,13 @@ class VekycService {
   }
 
   /**
-   * Initializes the RTC engine with the provided context.
-   * @param context - The context object containing the App ID and other configurations.
+   * Initializes the RTC engine with the provided App ID.
+   * @param appId - The App ID for the Agora project.
    * @throws Will throw an error if initialization fails.
    */
-  initialize(context: RtcEngineContext) {
+  initialize(appId: string) {
     try {
-      return this.engine.initialize(context);
+      return this.engine.initialize({ appId });
     } catch (error) {
       console.error('Failed to initialize the engine:', error);
       throw error;
