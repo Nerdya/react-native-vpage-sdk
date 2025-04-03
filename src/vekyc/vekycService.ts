@@ -8,6 +8,7 @@ import {
   RtcSurfaceView,
   VideoSourceType,
   ChannelMediaOptions,
+  RtcEngineContext,
 } from 'react-native-agora';
 
 /**
@@ -40,14 +41,14 @@ class VekycService {
   }
 
   /**
-   * Initializes the RTC engine with the provided App ID.
+   * Initializes the RTC engine with the provided context.
    * @param engine - The RTC engine instance.
-   * @param appId - The App ID for the Agora project.
+   * @param context - The context object containing the App ID and other configurations.
    * @throws Will throw an error if initialization fails.
    */
-  initialize(engine: IRtcEngine, appId: string) {
+  initialize(engine: IRtcEngine, context: RtcEngineContext) {
     try {
-      return engine.initialize({ appId });
+      return engine.initialize(context);
     } catch (error) {
       console.error('Failed to initialize the engine:', error);
       throw error;
@@ -197,4 +198,4 @@ export function createVekycService() {
 }
 
 // Export for external use
-export { RtcSurfaceView, VideoSourceType, IRtcEngineEventHandler, IRtcEngine };
+export { RtcSurfaceView, VideoSourceType, IRtcEngineEventHandler, IRtcEngine, RtcEngineContext };
