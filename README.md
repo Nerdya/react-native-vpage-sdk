@@ -34,113 +34,6 @@ Go to your **ios** folder and run:
 pod install
 ```
 
-## Example Usage
-
-```typescript
-const VideoComponent = () => {
-  const appId = 'YOUR_APP_ID';
-  const token = 'YOUR_TOKEN';
-  const channelName = 'YOUR_CHANNEL_NAME';
-  const localUid = 0;
-
-  const vekycService = createVekycService(appId);
-  const [isJoined, setIsJoined] = useState(false);
-  const [remoteUid, setRemoteUid] = useState(0);
-
-  useEffect(() => {
-    const init = async () => {
-      await vekycService.initialize();
-    
-      vekycService.registerEventHandler({
-        onJoinChannelSuccess: () => {
-          vekycService.enableVideo();
-          setIsJoined(true);
-        },
-        onUserJoined: (_connection, uid) => {
-          setRemoteUid(() => uid);
-        },
-        onUserOffline: (_connection, uid) => {
-          setRemoteUid((prevUid) => prevUid === uid ? 0 : prevUid);
-        }
-      });
-    
-      await vekycService.joinChannel(token, channelName, localUid);
-    };
-    
-    init();
-
-    return () => {
-      vekycService.cleanup();
-    };
-  }, []);
-
-  const leave = () => {
-    vekycService.leaveChannel();
-  }
-
-  return (
-    <SafeAreaView style={styles.main}>
-      <Text style={styles.head}>Video Call Screen</Text>
-      <View style={styles.btnContainer}>
-        <Text onPress={leave} style={styles.button}>
-          End Call
-        </Text>
-      </View>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContainer}>
-        {isJoined && (
-          <React.Fragment>
-            {/* Render local video */}
-            <Text>Local user uid: {localUid}</Text>
-            <RtcSurfaceView
-              canvas={{
-                uid: localUid,
-                sourceType: VideoSourceType.VideoSourceCamera,
-              }}
-              style={styles.videoView}
-            />
-
-            {/* Render remote video */}
-            {remoteUid ? (
-              <React.Fragment>
-                <Text>Remote user uid: {remoteUid}</Text>
-                <RtcSurfaceView
-                  canvas={{
-                    uid: remoteUid,
-                    sourceType: VideoSourceType.VideoSourceRemote,
-                  }}
-                  style={styles.videoView}
-                />
-              </React.Fragment>
-            ) : (
-              <Text>Waiting for remote user to join</Text>
-            )}
-          </React.Fragment>
-        )}
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  button: {
-    paddingHorizontal: 25,
-    paddingVertical: 4,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    backgroundColor: '#0055cc',
-    margin: 5,
-  },
-  main: { flex: 1, alignItems: 'center' },
-  scroll: { flex: 1, backgroundColor: '#ddeeff', width: '100%' },
-  scrollContainer: { alignItems: 'center' },
-  videoView: { width: '90%', height: 200 },
-  btnContainer: { flexDirection: 'row', justifyContent: 'center' },
-  head: { fontSize: 20 },
-});
-```
-
 ## Available Functions
 
 ### API
@@ -158,15 +51,7 @@ const styles = StyleSheet.create({
 
 ### VEKYC
 
-| Function                                    | Description                                                                                               |
-|---------------------------------------------|-----------------------------------------------------------------------------------------------------------|
-| `initialize()`                              | Initializes the engine and requests necessary permissions (on Android).                                   |
-| `registerEventHandler(eventHandler)`        | Registers event handlers for channel events like join success, remote user join, and leave.               |
-| `joinChannel(token, channelName, localUid)` | Joins a channel as a host using the provided token, channel name, and local user ID.                      |
-| `enableVideo()`                             | Enables video and starts the local video preview.                                                         |
-| `leaveChannel()`                            | Leaves the current channel.                                                                               |
-| `cleanup()`                                 | Ensures the channel is left, stops the video preview, unregisters event handlers, and releases resources. |
-| `RtcSurfaceView`                            | A React Native component for rendering local or remote video streams.                                     |
+```Check demo project```
 
 ## Demo
 
