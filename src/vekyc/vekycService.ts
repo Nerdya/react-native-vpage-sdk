@@ -21,7 +21,12 @@ export function createVekycEngine(): IRtcEngine {
 }
 
 class VekycService {
+  private engine?: IRtcEngine;
   private eventHandler?: IRtcEngineEventHandler;
+
+  constructor() {
+    this.engine = createAgoraRtcEngine();
+  }
 
   /**
    * Requests necessary permissions for audio and video on Android.
@@ -37,33 +42,39 @@ class VekycService {
 
   /**
    * Initializes the RTC engine with the provided App ID.
-   * @param engine - The RTC engine instance.
    * @param appId - The App ID for the Agora project.
    */
-  initialize(engine: IRtcEngine, appId: string) {
-    return engine?.initialize({ appId });
+  initialize(appId: string) {
+    if (!this.engine) {
+      throw new Error('Engine is not created.');
+    }
+    return this.engine.initialize({ appId });
   }
 
   /**
    * Registers event handlers for callbacks.
-   * @param engine - The RTC engine instance.
    * @param eventHandler - An object implementing the IRtcEngineEventHandler interface.
    */
-  registerEventHandler(engine: IRtcEngine, eventHandler: IRtcEngineEventHandler) {
+  registerEventHandler(eventHandler: IRtcEngineEventHandler) {
+    if (!this.engine) {
+      throw new Error('Engine is not created.');
+    }
     this.eventHandler = eventHandler;
-    engine?.registerEventHandler(this.eventHandler);
+    this.engine.registerEventHandler(this.eventHandler);
   }
 
   /**
    * Joins a channel as a host.
-   * @param engine - The RTC engine instance.
    * @param token - The token for authentication.
    * @param channelName - The name of the channel to join.
    * @param localUid - The UID of the local user.
    * @param options - Additional channel media options.
    * @returns A promise that resolves when the user successfully joins the channel.
    */
-  joinChannel(engine: IRtcEngine, token: string, channelName: string, localUid: number, options: ChannelMediaOptions = {}) {
+  joinChannel(token: string, channelName: string, localUid: number, options: ChannelMediaOptions = {}) {
+    if (!this.engine) {
+      throw new Error('Engine is not created.');
+    }
     const opts: ChannelMediaOptions = {
       channelProfile: ChannelProfileType.ChannelProfileCommunication,
       clientRoleType: ClientRoleType.ClientRoleBroadcaster,
@@ -74,62 +85,75 @@ class VekycService {
       ...options,
     };
 
-    return engine?.joinChannel(token, channelName, localUid, opts);
+    return this.engine.joinChannel(token, channelName, localUid, opts);
   }
 
   /**
    * Enables video for the RTC engine.
-   * @param engine - The RTC engine instance.
    */
-  enableVideo(engine: IRtcEngine) {
-    return engine?.enableVideo();
+  enableVideo() {
+    if (!this.engine) {
+      throw new Error('Engine is not created.');
+    }
+    return this.engine.enableVideo();
   }
 
   /**
    * Starts the local video preview.
-   * @param engine - The RTC engine instance.
    */
-  startPreview(engine: IRtcEngine) {
-    return engine?.startPreview();
+  startPreview() {
+    if (!this.engine) {
+      throw new Error('Engine is not created.');
+    }
+    return this.engine.startPreview();
   }
 
   /**
    * Stops the local video preview.
-   * @param engine - The RTC engine instance.
    */
-  stopPreview(engine: IRtcEngine) {
-    return engine?.stopPreview();
+  stopPreview() {
+    if (!this.engine) {
+      throw new Error('Engine is not created.');
+    }
+    return this.engine.stopPreview();
   }
 
   /**
    * Leaves the current channel.
-   * @param engine - The RTC engine instance.
    */
-  leaveChannel(engine: IRtcEngine) {
-    return engine?.leaveChannel();
+  leaveChannel() {
+    if (!this.engine) {
+      throw new Error('Engine is not created.');
+    }
+    return this.engine.leaveChannel();
   }
 
   /**
    * Unregisters the event handler from the RTC engine.
-   * @param engine - The RTC engine instance.
    * @returns A boolean indicating whether the event handler was unregistered.
    */
-  unregisterEventHandler(engine: IRtcEngine) {
+  unregisterEventHandler() {
+    if (!this.engine) {
+      throw new Error('Engine is not created.');
+    }
     if (!this.eventHandler) {
       return false;
     }
-    return engine?.unregisterEventHandler(this.eventHandler);
+    return this.engine.unregisterEventHandler(this.eventHandler);
   }
 
   /**
    * Cleans up the engine and releases resources.
-   * @param engine - The RTC engine instance.
    */
-  cleanup(engine: IRtcEngine) {
-    this.leaveChannel(engine);
-    this.stopPreview(engine);
-    this.unregisterEventHandler(engine);
-    engine?.release();
+  cleanup() {
+    if (!this.engine) {
+      throw new Error('Engine is not created.');
+    }
+    this.leaveChannel();
+    this.stopPreview();
+    this.unregisterEventHandler();
+    this.engine.release();
+    this.engine = undefined;
   }
 }
 
