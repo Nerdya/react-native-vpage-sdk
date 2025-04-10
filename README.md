@@ -23,7 +23,21 @@ yarn add react-native-vpage-sdk
 or
 
 ```shell script
-npm i --save react-native-vpage-sdk
+npm i react-native-vpage-sdk
+```
+
+Also install expo and eas-cli:
+
+```shell script
+yarn add expo
+yarn add eas-cli
+```
+
+or
+
+```shell script
+npm i expo
+npm i eas-cli
 ```
 
 ### iOS Setup
