@@ -10,16 +10,19 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
+    "@stomp/stompjs": "^7.1.1",
     "axios": "^1.8.4",
     "react": "^19.0.0",
     "react-native": "^0.78.1",
     "react-native-agora": "^4.5.2",
-    "react-native-crypto-js": "^1.0.0"
+    "react-native-crypto-js": "^1.0.0",
+    "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
     "@types/react": "^19.0.12",
     "@types/react-native": "^0.73.0",
     "@types/react-native-crypto-js": "^1.0.3",
+    "@types/sockjs-client": "^1.5.4",
     "rollup": "^4.37.0",
     "tsup": "^8.4.0",
     "typescript": "^5.8.2"
