@@ -10,7 +10,7 @@ export const environment = {
   CLOSE_VIDEO: '/vekyc/close-video',
   RATING: '/vekyc/rating/:id',
 
-  SOCKET_CHAT: '/websocket-agent',
+  SOCKET_PATH: '/websocket-agent',
 }
 
 export enum ActionHistory {

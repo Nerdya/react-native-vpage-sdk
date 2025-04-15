@@ -1,26 +1,24 @@
 import { ActivationState, Client, IFrame, IMessage, StompHeaders } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { environment } from '../utils/helpers';
 
 class SocketService {
   private socket?: any;
-  private socketPath: string = '';
   private sessionKey: string = '';
-  private token: string = '';
-  private socketId: string = '';
+  protected token: string = '';
+  protected socketId: string = '';
   private client?: Client;
   public timerInterval: NodeJS.Timeout | null = null;
 
   /**
    * Initializes the STOMP client with the given WebSocket server URL and configuration.
-   * @param {string} serverUrl - The base URL of the WebSocket server.
-   * @param {string} socketPath - The path for the WebSocket connection.
+   * @param {string} serverURL - The base URL of the WebSocket server.
    * @param {string} sessionKey - The session key for the user.
    * @param {string} token - The authentication token.
    * @param {(message: string) => void} [debugCallback] - Optional callback for debugging messages.
    */
   initialize(
-    serverUrl: string,
-    socketPath: string,
+    serverURL: string,
     sessionKey: string,
     token: string,
     debugCallback?: (message: string) => void
@@ -30,10 +28,9 @@ class SocketService {
       return;
     }
 
-    this.socket = new SockJS(serverUrl + socketPath, null, { timeout: 30000 });
-    this.setSocketPath(socketPath);
-    this.setSessionKey(sessionKey);
-    this.setToken(token);
+    this.socket = new SockJS(serverURL + environment.SOCKET_PATH, null, { timeout: 30000 });
+    this.sessionKey = sessionKey;
+    this.token = token;
 
     this.client = new Client({
       webSocketFactory: () => this.socket,
@@ -46,62 +43,13 @@ class SocketService {
   }
 
   /**
-   * Sets the WebSocket path.
-   * @param {string} socketPath - The WebSocket path.
-   */
-  private setSocketPath(socketPath: string): void {
-    this.socketPath = socketPath;
-  }
-
-  /**
-   * Retrieves the WebSocket path.
-   * @returns {string} The WebSocket path.
-   */
-  private getSocketPath(): string {
-    return this.socketPath;
-  }
-
-  /**
-   * Sets the session key.
-   * @param {string} sessionKey - The session key.
-   */
-  private setSessionKey(sessionKey: string): void {
-    this.sessionKey = sessionKey;
-  }
-
-  /**
-   * Retrieves the session key.
-   * @returns {string} The session key.
-   */
-  private getSessionKey(): string {
-    return this.sessionKey;
-  }
-
-  /**
-   * Sets the authentication token.
-   * @param {string} token - The authentication token.
-   */
-  private setToken(token: string): void {
-    this.token = token;
-  }
-
-  /**
-   * Retrieves the authentication token.
-   * @returns {string} The authentication token.
-   */
-  private getToken(): string {
-    return this.token;
-  }
-
-  /**
    * Sets the socket ID based on the WebSocket URL.
-   * @param {string} socketPath - The WebSocket path.
    */
-  private setSocketId(socketPath: string): void {
+  private setSocketId(): void {
     const url = this.socket?._transport?.url?.toString();
 
-    if (url && url.includes(socketPath)) {
-      const parts = url.split(socketPath);
+    if (url && url.includes(environment.SOCKET_PATH)) {
+      const parts = url.split(environment.SOCKET_PATH);
       if (parts.length > 1) {
         const pathAfterSocketPath = parts[1];
         const segments = pathAfterSocketPath.split('/');
@@ -110,16 +58,8 @@ class SocketService {
         console.warn('Unexpected path after socket path:', parts);
       }
     } else {
-      console.warn('Unexpected socket path:', socketPath);
+      console.warn('Unexpected url:', url);
     }
-  }
-
-  /**
-   * Retrieves the socket ID.
-   * @returns {string} The socket ID.
-   */
-  private getSocketId(): string {
-    return this.socketId;
   }
 
   /**
@@ -161,8 +101,8 @@ class SocketService {
       socketService.send(`/app/healthCheck`, {
         'Access-Control-Allow-Origin': '*',
         timestamp: new Date().getTime().toString(),
-        token: socketService.getToken(),
-        socketId: socketService.getSocketId(),
+        token: socketService.token,
+        socketId: socketService.socketId,
       });
     } catch (error) {
       console.warn('Socket service instance is null. Stopping health check...');
@@ -194,7 +134,7 @@ class SocketService {
       return;
     }
 
-    return this.subscribe(`/user/${this.getSessionKey()}/notify`, callback);
+    return this.subscribe(`/user/${this.sessionKey}/notify`, callback);
   }
 
   /**
@@ -207,7 +147,7 @@ class SocketService {
       return;
     }
 
-    return this.subscribe(`/user/${this.getSocketId()}/notify`, callback);
+    return this.subscribe(`/user/${this.socketId}/notify`, callback);
   }
 
   /**
@@ -220,7 +160,7 @@ class SocketService {
       return;
     }
 
-    return this.subscribe(`/user/${this.getSocketId()}/health`, callback);
+    return this.subscribe(`/user/${this.socketId}/health`, callback);
   }
 
   /**
@@ -276,7 +216,7 @@ class SocketService {
     this.client.onUnhandledFrame = onUnhandledFrame;
     this.client.beforeConnect = beforeConnect;
     this.client.onConnect = (frame) => {
-      this.setSocketId(this.getSocketPath());
+      this.setSocketId();
       onConnect(frame);
     };
     this.client.onDisconnect = onDisconnect;
@@ -304,7 +244,7 @@ class SocketService {
 
     const socketHeaders: StompHeaders = {
       'Access-Control-Allow-Origin': '*',
-      token: this.getToken(),
+      token: this.token,
       deviceInfo: JSON.stringify(deviceInfo),
     };
 
@@ -369,9 +309,9 @@ class SocketService {
       return;
     }
 
-    this.unsubscribe(`/user/${this.getSessionKey()}/notify`);
-    this.unsubscribe(`/user/${this.getSocketId()}/notify`);
-    this.unsubscribe(`/user/${this.getSocketId()}/health`);
+    this.unsubscribe(`/user/${this.sessionKey}/notify`);
+    this.unsubscribe(`/user/${this.socketId}/notify`);
+    this.unsubscribe(`/user/${this.socketId}/health`);
     this.unsubscribe(`/app/live`);
   }
 
