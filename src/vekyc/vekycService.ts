@@ -54,11 +54,11 @@ class VekycService {
    * Registers an event handler for receiving RTC engine callbacks.
    * @param {IRtcEngineEventHandler} eventHandler - An object implementing the IRtcEngineEventHandler interface.
    * @returns true: Success. false: Failure.
-   * @throws {Error} If the engine is not initialized.
    */
   registerEventHandler(eventHandler: IRtcEngineEventHandler) {
     if (!this.engine) {
-      throw new Error('Engine is not initialized.');
+      console.error('Engine is not initialized.')
+      return;
     }
     this.eventHandler = eventHandler;
     return this.engine.registerEventHandler(this.eventHandler);
@@ -71,11 +71,11 @@ class VekycService {
    * @param {number} localUid - The UID of the local user.
    * @param {ChannelMediaOptions} [options={}] - Additional channel media options.
    * @returns 0: Success. < 0: Failure.
-   * @throws {Error} If the engine is not initialized.
    */
   joinChannel(token: string, channelName: string, localUid: number, options: ChannelMediaOptions = {}) {
     if (!this.engine) {
-      throw new Error('Engine is not initialized.');
+      console.error('Engine is not initialized.')
+      return;
     }
     const opts: ChannelMediaOptions = {
       channelProfile: ChannelProfileType.ChannelProfileCommunication,
@@ -93,11 +93,11 @@ class VekycService {
   /**
    * Enables video functionality in the RTC engine.
    * @returns 0: Success. < 0: Failure.
-   * @throws {Error} If the engine is not initialized.
    */
   enableVideo() {
     if (!this.engine) {
-      throw new Error('Engine is not initialized.');
+      console.error('Engine is not initialized.')
+      return;
     }
     return this.engine.enableVideo();
   }
@@ -105,11 +105,11 @@ class VekycService {
   /**
    * Starts the local video preview.
    * @returns 0: Success. < 0: Failure.
-   * @throws {Error} If the engine is not initialized.
    */
   startPreview() {
     if (!this.engine) {
-      throw new Error('Engine is not initialized.');
+      console.error('Engine is not initialized.')
+      return;
     }
     return this.engine.startPreview();
   }
@@ -117,11 +117,11 @@ class VekycService {
   /**
    * Stops the local video preview.
    * @returns 0: Success. < 0: Failure.
-   * @throws {Error} If the engine is not initialized.
    */
   stopPreview() {
     if (!this.engine) {
-      throw new Error('Engine is not initialized.');
+      console.error('Engine is not initialized.')
+      return;
     }
     return this.engine.stopPreview();
   }
@@ -129,11 +129,11 @@ class VekycService {
   /**
    * Leaves the current channel.
    * @returns 0: Success. < 0: Failure.
-   * @throws {Error} If the engine is not initialized.
    */
   leaveChannel() {
     if (!this.engine) {
-      throw new Error('Engine is not initialized.');
+      console.error('Engine is not initialized.')
+      return;
     }
     return this.engine.leaveChannel();
   }
@@ -141,11 +141,11 @@ class VekycService {
   /**
    * Unregisters the event handler from the RTC engine.
    * @returns {boolean} True if the event handler was successfully unregistered, false otherwise.
-   * @throws {Error} If the engine is not initialized.
    */
   unregisterEventHandler() {
     if (!this.engine) {
-      throw new Error('Engine is not initialized.');
+      console.error('Engine is not initialized.')
+      return;
     }
     if (!this.eventHandler) {
       return false;
@@ -157,11 +157,11 @@ class VekycService {
    * Cleans up the RTC engine and releases all resources.
    * This method stops the preview, leaves the channel, unregisters the event handler, and releases the engine.
    * @returns {void} Cleans up the engine.
-   * @throws {Error} If the engine is not initialized.
    */
   cleanup() {
     if (!this.engine) {
-      throw new Error('Engine is not initialized.');
+      console.error('Engine is not initialized.')
+      return;
     }
     this.leaveChannel();
     this.stopPreview();

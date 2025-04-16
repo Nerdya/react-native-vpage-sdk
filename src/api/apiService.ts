@@ -25,7 +25,6 @@ class APIService {
    * @param endpoint - The API endpoint to send the GET request to.
    * @param params - (Optional) Query parameters for the request.
    * @returns A promise resolving to the response data.
-   * @throws An error if the request fails.
    */
   private async get(endpoint: string, params?: Record<string, any>) {
     try {
@@ -33,7 +32,6 @@ class APIService {
       return res.data as unknown;
     } catch (error) {
       console.error(`GET ${endpoint} failed:`, error);
-      throw error;
     }
   }
 
@@ -43,7 +41,6 @@ class APIService {
    * @param ids - An object containing the dynamic parameters to replace in the endpoint.
    * @param params - (Optional) Query parameters for the request.
    * @returns A promise resolving to the response data.
-   * @throws An error if the request fails.
    */
   private async getNested(endpoint: string, ids: Record<string, any>, params?: Record<string, any>) {
     const keys = Object.keys(ids);
@@ -60,7 +57,6 @@ class APIService {
    * @param endpoint - The API endpoint to send the POST request to.
    * @param data - (Optional) The payload data for the request.
    * @returns A promise resolving to the response data.
-   * @throws An error if the request fails.
    */
   private async post(endpoint: string, data?: Record<string, any>) {
     try {
@@ -68,7 +64,6 @@ class APIService {
       return res.data as unknown;
     } catch (error) {
       console.error(`POST ${endpoint} failed:`, error);
-      throw error;
     }
   }
 
@@ -78,7 +73,6 @@ class APIService {
    * @param ids - An object containing the dynamic parameters to replace in the endpoint.
    * @param data - (Optional) The payload data for the request.
    * @returns A promise resolving to the response data.
-   * @throws An error if the request fails.
    */
   private async postChildren(endpoint: string, ids: Record<string, any>, data?: Record<string, any>) {
     const keys = Object.keys(ids);
@@ -96,7 +90,6 @@ class APIService {
    * Fetches configuration information for a given appointment.
    * @param appointmentId - The ID of the appointment.
    * @returns A promise resolving to the configuration information.
-   * @throws An error if the request fails.
    */
   async getConfigInfo(appointmentId: string) {
     try {
@@ -105,7 +98,6 @@ class APIService {
       return res as ApiResponse<ConfigDto>;
     } catch (error) {
       console.error('Error fetching info:', error);
-      throw error;
     }
   }
 
@@ -114,7 +106,6 @@ class APIService {
    * @param appointmentId - The ID of the appointment.
    * @param agentId - (Optional) The ID of the agent.
    * @returns A promise resolving to the meeting creation response.
-   * @throws An error if the request fails.
    */
   async createMeeting(appointmentId: string, customerIp: string, agentId = null) {
     try {
@@ -124,7 +115,6 @@ class APIService {
       return res as ApiResponse<CreateMeetingDto>;
     } catch (error) {
       console.error('Error creating meeting:', error);
-      throw error;
     }
   }
 
@@ -134,7 +124,6 @@ class APIService {
    * @param detail - (Optional) Additional details for the log.
    * @param sessionKey - (Optional) The session key.
    * @returns A promise resolving to the log save response.
-   * @throws An error if the request fails.
    */
   async saveLog(actionHistory: ActionHistory, detail = null, sessionKey = null) {
     try {
@@ -143,7 +132,6 @@ class APIService {
       return res as ApiResponse<any>;
     } catch (error) {
       console.error('Error saving log:', error);
-      throw error;
     }
   }
 
@@ -152,7 +140,6 @@ class APIService {
    * @param appointmentId - The ID of the appointment.
    * @param agentId - (Optional) The ID of the agent.
    * @returns A promise resolving to the submission response.
-   * @throws An error if the request fails.
    */
   async submit(appointmentId: string, agentId = null) {
     try {
@@ -161,7 +148,6 @@ class APIService {
       return res as ApiResponse<SubmitDto>;
     } catch (error) {
       console.error('Error submitting:', error);
-      throw error;
     }
   }
 
@@ -170,7 +156,6 @@ class APIService {
    * @param appointmentId - The ID of the appointment.
    * @param otp - The OTP to verify.
    * @returns A promise resolving to the OTP verification response.
-   * @throws An error if the request fails.
    */
   // async verifyOTP(appointmentId: string, otp: string) {
   //   try {
@@ -179,7 +164,6 @@ class APIService {
   //     return res as ApiResponse<VerifyOTPDto>;
   //   } catch (error) {
   //     console.error('Error verifying OTP:', error);
-  //     throw error;
   //   }
   // }
 
@@ -187,7 +171,6 @@ class APIService {
    * Resends an OTP for a given appointment.
    * @param appointmentId - The ID of the appointment.
    * @returns A promise resolving to the OTP resend response.
-   * @throws An error if the request fails.
    */
   // async resendOTP(appointmentId: string) {
   //   try {
@@ -196,7 +179,6 @@ class APIService {
   //     return res as ApiResponse<ResendOTPDto>;
   //   } catch (error) {
   //     console.error('Error resending OTP:', error);
-  //     throw error;
   //   }
   // }
 
@@ -204,7 +186,6 @@ class APIService {
    * Checks the self-KYC status for a given session key.
    * @param sessionKey - The session key.
    * @returns A promise resolving to the self-KYC status.
-   * @throws An error if the request fails.
    */
   async checkSelfKYC(sessionKey: string) {
     try {
@@ -213,7 +194,6 @@ class APIService {
       return res as ApiResponse<CheckSelfKycDto>;
     } catch (error) {
       console.error('Error checking self KYC:', error);
-      throw error;
     }
   }
 
@@ -223,7 +203,6 @@ class APIService {
    * @param sessionKey - The session key.
    * @param agentId - (Optional) The ID of the agent.
    * @returns A promise resolving to the hook response.
-   * @throws An error if the request fails.
    */
   async hook(sessionId: string, sessionKey: string, agentId = null) {
     try {
@@ -232,7 +211,6 @@ class APIService {
       return res as ApiResponse<any>;
     } catch (error) {
       console.error('Error hooking:', error);
-      throw error;
     }
   }
 
@@ -240,7 +218,6 @@ class APIService {
    * Closes a video session for a given session key.
    * @param sessionKey - The session key.
    * @returns A promise resolving to the video close response.
-   * @throws An error if the request fails.
    */
   async closeVideo(sessionKey: string) {
     try {
@@ -249,7 +226,6 @@ class APIService {
       return res as ApiResponse<any>;
     } catch (error) {
       console.error('Error closing video:', error);
-      throw error;
     }
   }
 
@@ -260,7 +236,6 @@ class APIService {
    * @param agentRating - The rating for the agent.
    * @param agentFeedback - The feedback for the agent.
    * @returns A promise resolving to the rating response.
-   * @throws An error if the request fails.
    */
   async rateCall(callRating: number, callFeedback: string, agentRating: number, agentFeedback: string) {
     try {
@@ -274,7 +249,6 @@ class APIService {
       return res as ApiResponse<any>;
     } catch (error) {
       console.error('Error rating:', error);
-      throw error;
     }
   }
 }
