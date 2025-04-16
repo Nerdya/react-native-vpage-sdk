@@ -99,15 +99,15 @@ class SocketService {
    */
   private validateToken(socketService: SocketService): void {
     try {
-      socketService.send({
-        destination: `/app/healthCheck`, 
-        headers: {
+      socketService.send(
+        `/app/healthCheck`, 
+        {
           'Access-Control-Allow-Origin': '*',
           timestamp: new Date().getTime().toString(),
           token: socketService.token,
           socketId: socketService.socketId,
         }
-      });
+      );
     } catch (error) {
       console.warn('Socket service instance is null. Stopping health check...');
       this.clearHealthCheck();
@@ -193,13 +193,13 @@ class SocketService {
    * });
    * ```
    */
-  send(params: IPublishParams): void {
+  send(destination: string, headers?: Record<string, string>, body?: any, skipContentLengthHeader = true): void {
     if (!this.client) {
       console.error('STOMP client is not initialized.');
       return;
     }
 
-    this.client.publish(params);
+    this.client.publish({ destination, headers, body, skipContentLengthHeader });
   }
 
   /**
