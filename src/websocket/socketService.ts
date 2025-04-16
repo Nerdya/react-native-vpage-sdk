@@ -179,9 +179,9 @@ class SocketService {
    * Sends a message to a specific destination.
    * @param {string} destination - The destination to send the message to.
    * @param {Record<string, string>} [headers={}] - Optional headers for the message.
-   * @param {string} [body=''] - The message body.
+   * @param {string} [body='\0'] - The message body.
    */
-  send(destination: string, headers: Record<string, string> = {}, body: string = ''): void {
+  send(destination: string, headers: Record<string, string> = {}, body: string = '\0'): void {
     if (!this.client) {
       console.error('STOMP client is not initialized.');
       return;
