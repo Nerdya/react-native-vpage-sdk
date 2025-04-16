@@ -1,4 +1,4 @@
-import { ActivationState, Client, IFrame, IMessage, StompHeaders } from '@stomp/stompjs';
+import { ActivationState, Client, IFrame, IMessage, IPublishParams, StompHeaders } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { environment } from '../utils/helpers';
 
@@ -98,11 +98,14 @@ class SocketService {
    */
   private validateToken(socketService: SocketService): void {
     try {
-      socketService.send(`/app/healthCheck`, {
-        'Access-Control-Allow-Origin': '*',
-        timestamp: new Date().getTime().toString(),
-        token: socketService.token,
-        socketId: socketService.socketId,
+      socketService.send({
+        destination: `/app/healthCheck`, 
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          timestamp: new Date().getTime().toString(),
+          token: socketService.token,
+          socketId: socketService.socketId,
+        }
       });
     } catch (error) {
       console.warn('Socket service instance is null. Stopping health check...');
@@ -176,18 +179,26 @@ class SocketService {
   }
 
   /**
-   * Sends a message to a specific destination.
-   * @param {string} destination - The destination to send the message to.
-   * @param {Record<string, string>} [headers={}] - Optional headers for the message.
-   * @param {string} [body='\0'] - The message body.
+   * Sends a message to a specific destination using the STOMP client.
+   * @param {IPublishParams} params - The parameters for the message, including the destination, headers, and body.
+   * @returns {void} Logs an error and exits if the STOMP client is not initialized.
+   * 
+   * Example usage:
+   * ```typescript
+   * socketService.send({
+   *   destination: '/app/example',
+   *   headers: { 'custom-header': 'value' },
+   *   body: 'Message content',
+   * });
+   * ```
    */
-  send(destination: string, headers: Record<string, string> = {}, body: string = '\0'): void {
+  send(params: IPublishParams): void {
     if (!this.client) {
       console.error('STOMP client is not initialized.');
       return;
     }
 
-    this.client.publish({ destination, headers, body });
+    this.client.publish(params);
   }
 
   /**
