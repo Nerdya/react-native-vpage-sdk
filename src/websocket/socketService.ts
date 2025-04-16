@@ -34,7 +34,8 @@ class SocketService {
 
     this.client = new Client({
       webSocketFactory: () => this.socket,
-      brokerURL: undefined,
+      forceBinaryWSFrames: true,
+      appendMissingNULLonIncoming: true,
       reconnectDelay: 5000,
       heartbeatIncoming: 5000,
       heartbeatOutgoing: 5000,
