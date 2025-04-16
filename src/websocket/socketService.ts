@@ -34,7 +34,7 @@ class SocketService {
 
     this.client = new Client({
       webSocketFactory: () => this.socket,
-      forceBinaryWSFrames: true,
+      brokerURL: undefined,
       appendMissingNULLonIncoming: true,
       reconnectDelay: 5000,
       heartbeatIncoming: 5000,
@@ -181,16 +181,15 @@ class SocketService {
 
   /**
    * Sends a message to a specific destination using the STOMP client.
-   * @param {IPublishParams} params - The parameters for the message, including the destination, headers, and body.
+   * @param {string} destination - The destination to send the message to (e.g., a topic or queue).
+   * @param {Record<string, string>} [headers={}] - Optional headers to include with the message.
+   * @param {any} [body] - The body of the message to send.
+   * @param {boolean} [skipContentLengthHeader=true] - Whether to skip adding the `content-length` header.
    * @returns {void} Logs an error and exits if the STOMP client is not initialized.
    * 
    * Example usage:
    * ```typescript
-   * socketService.send({
-   *   destination: '/app/example',
-   *   headers: { 'custom-header': 'value' },
-   *   body: 'Message content',
-   * });
+   * socketService.send('/app/example', { 'custom-header': 'value' }, 'Message content');
    * ```
    */
   send(destination: string, headers?: Record<string, string>, body?: any, skipContentLengthHeader = true): void {
