@@ -15,13 +15,13 @@ class SocketService {
    * @param {string} serverURL - The base URL of the WebSocket server.
    * @param {string} sessionKey - The session key for the user.
    * @param {string} token - The authentication token.
-   * @param {(message: string) => void} [debugCallback] - Optional callback for debugging messages.
+   * @param {(message: string) => {}} [debugCallback] - Optional callback for debugging messages.
    */
   initialize(
     serverURL: string,
     sessionKey: string,
     token: string,
-    debugCallback?: (message: string) => void
+    debugCallback = (message: string) => {}
   ): void {
     if (this.client) {
       console.error('STOMP client is already initialized.');
