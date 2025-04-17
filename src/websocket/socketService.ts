@@ -224,7 +224,7 @@ class SocketService {
    * socketService.sendNetworkStatus(1, 2);
    * ```
    */
-  sendNetworkStatus(downlinkNetworkQuality: number, uplinkNetworkQuality: number, isLow = null): void {
+  sendNetworkStatus(downlinkNetworkQuality: number, uplinkNetworkQuality: number, isLow: null | 'true'): void {
     try {
       this.send(
         `/app/network`, 
