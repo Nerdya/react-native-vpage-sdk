@@ -64,57 +64,6 @@ class SocketService {
   }
 
   /**
-   * Clears the health check interval.
-   */
-  clearHealthCheck(): void {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-      this.timerInterval = null;
-      console.log('Health check cleared.');
-    }
-  }
-
-  /**
-   * Starts the interval to send health checks.
-   * @param {SocketService} socketService - The instance of the SocketService.
-   */
-  startHealthCheck(socketService: SocketService): void {
-    const timeSleep = 3000;
-
-    this.clearHealthCheck();
-
-    if (!socketService) {
-      console.warn('Socket service instance is null.');
-      return;
-    }
-
-    this.timerInterval = setInterval(() => this.validateToken(socketService), timeSleep);
-
-    console.log('Health check started.');
-  }
-
-  /**
-   * Validates the token by sending a health check message.
-   * @param {SocketService} socketService - The instance of the SocketService.
-   */
-  private validateToken(socketService: SocketService): void {
-    try {
-      socketService.send(
-        `/app/healthCheck`, 
-        {
-          'Access-Control-Allow-Origin': '*',
-          timestamp: new Date().getTime().toString(),
-          token: socketService.token,
-          socketId: socketService.socketId,
-        }
-      );
-    } catch (error) {
-      console.warn('Socket service instance is null. Stopping health check...');
-      this.clearHealthCheck();
-    }
-  }
-
-  /**
    * Subscribes to a specific topic.
    * @param {string} topic - The topic to subscribe to.
    * @param {(message: IMessage) => void} callback - The callback function to handle incoming messages.
@@ -199,6 +148,104 @@ class SocketService {
     }
 
     this.client.publish({ destination, headers, body });
+  }
+
+  /**
+   * Clears the health check interval.
+   */
+  clearHealthCheck(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+      console.log('Health check cleared.');
+    }
+  }
+
+  /**
+   * Starts the interval to send health checks.
+   * @param {SocketService} socketService - The instance of the SocketService.
+   */
+  startHealthCheck(socketService: SocketService): void {
+    const timeSleep = 3000;
+
+    this.clearHealthCheck();
+
+    if (!socketService) {
+      console.warn('Socket service instance is null.');
+      return;
+    }
+
+    this.timerInterval = setInterval(() => this.validateToken(socketService), timeSleep);
+
+    console.log('Health check started.');
+  }
+
+  /**
+   * Validates the token by sending a health check message.
+   * @param {SocketService} socketService - The instance of the SocketService.
+   */
+  private validateToken(socketService: SocketService): void {
+    try {
+      socketService.send(
+        `/app/healthCheck`, 
+        {
+          'Access-Control-Allow-Origin': '*',
+          timestamp: new Date().getTime().toString(),
+          token: socketService.token,
+          socketId: socketService.socketId,
+        }
+      );
+    } catch (error) {
+      console.warn('Socket service instance is null. Stopping health check...');
+      this.clearHealthCheck();
+    }
+  }
+
+  /**
+   * Sends the network status to the server.
+   * This method sends information about the downlink and uplink network quality
+   * to the `/app/network` endpoint using the STOMP client.
+   *
+   * @param {number} downlinkNetworkQuality - The quality of the downlink network.
+   * @param {number} uplinkNetworkQuality - The quality of the uplink network.
+   * 
+   * It is calculated based on the uplink transmission bitrate, uplink packet loss rate, RTT (round-trip time) and jitter.
+   *
+   * 0: The quality is unknown.
+   * 1: The quality is excellent.
+   * 2: The quality is good, but the bitrate is less than optimal.
+   * 3: Users experience slightly impaired communication.
+   * 4: Users can communicate with each other, but not very smoothly.
+   * 5: The quality is so poor that users can barely communicate.
+   * 6: The network is disconnected and users cannot communicate.
+   *
+   * Example usage:
+   * ```typescript
+   * socketService.sendNetworkStatus(1, 2);
+   * ```
+   */
+  sendNetworkStatus(downlinkNetworkQuality: number, uplinkNetworkQuality: number, isLow = null): void {
+    try {
+      this.send(
+        `/app/network`, 
+        {
+          'Access-Control-Allow-Origin': '*',
+          sessionKey: this.sessionKey,
+          token: this.token,
+          socketId: this.socketId,
+        },
+        JSON.stringify({
+          user: 'CUSTOMER',
+          sessionKey: this.sessionKey,
+          socketId: this.socketId,
+          downlinkNetworkQuality,
+          uplinkNetworkQuality,
+          ...(isLow !== null && { isLow }),
+        })
+      );
+    } catch (error) {
+      console.warn('Error sending network status:', error);
+    }
   }
 
   /**
