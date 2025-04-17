@@ -192,13 +192,13 @@ class SocketService {
    * socketService.send('/app/example', { 'custom-header': 'value' }, 'Message content');
    * ```
    */
-  send(destination: string, headers?: Record<string, string>, body?: any, skipContentLengthHeader = true): void {
+  send(destination: string, headers?: Record<string, string>, body?: any): void {
     if (!this.client) {
       console.error('STOMP client is not initialized.');
       return;
     }
 
-    this.client.publish({ destination, headers, body, skipContentLengthHeader });
+    this.client.publish({ destination, headers, body });
   }
 
   /**
