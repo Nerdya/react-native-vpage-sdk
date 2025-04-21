@@ -17,6 +17,7 @@
     "react-native-agora": "^4.5.2",
     "react-native-crypto-js": "^1.0.0",
     "react-native-device-info": "^14.0.4",
+    "react-native-public-ip": "^1.0.2",
     "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
@@ -29,9 +30,10 @@
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
+    "@stomp/stompjs": ">=7.1.1",
+    "agora-react-native-rtm": ">=1.5.1",
     "react": ">=17.0.0",
     "react-native": ">=0.65.0",
-    "@stomp/stompjs": ">=7.1.1",
     "react-native-agora": ">=4.5.2",
     "react-native-device-info": ">=14.0.4",
     "sockjs-client": ">=1.6.1"
