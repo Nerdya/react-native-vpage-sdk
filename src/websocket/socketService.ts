@@ -2,6 +2,8 @@ import { ActivationState, Client, IFrame, IMessage, StompHeaders, StompSubscript
 import SockJS from 'sockjs-client';
 import { environment } from '../utils/helpers';
 import DeviceInfo from 'react-native-device-info';
+import { Platform } from 'react-native';
+import * as Device from 'expo-device';
 
 class SocketService {
   private socket?: any;
@@ -349,29 +351,61 @@ class SocketService {
   }
 
   /**
-   * Retrieves information about the device running the application.
+   * Retrieves device information using react-native-device-info.
    * 
    * @returns {object} An object containing the following properties:
    * - `os` (string): The operating system name and version (e.g., "iOS 16.4" or "Android 13").
-   * - `browser` (string): The browser information. Always returns `'N/A'` for React Native apps.
    * - `device` (string): The type of device (e.g., `'Handset'`, `'Tablet'`, `'Desktop'`, etc.).
-   * 
-   * Example usage:
-   * ```typescript
-   * const deviceInfo = socketService.getDeviceInfo();
-   * console.log(deviceInfo);
-   * ```
    */
-  getDeviceInfo(): { os: string; browser: string; device: string } {
-    const os = `${DeviceInfo.getSystemName()} ${DeviceInfo.getSystemVersion()}`;
-    const browser = 'N/A';
-    const device = DeviceInfo.getDeviceType();
-  
-    return {
-      os,
-      browser,
-      device,
-    };
+  getDeviceInfo(): { os: string; device: string } {
+    try {
+      const os = `${DeviceInfo.getSystemName()} ${DeviceInfo.getSystemVersion()}`;
+      const device = DeviceInfo.getDeviceType() || 'Unknown';
+
+      return {
+        os,
+        device,
+      };
+    } catch (err) {
+      console.warn('Device info unavailable', err);
+      return {
+        os: 'Unknown',
+        device: 'Unknown',
+      };
+    }
+  }
+
+  /**
+   * Retrieves device information using expo-device.
+   * 
+   * @returns {object} An object containing the following properties:
+   * - `os` (string): The operating system name and version (e.g., "iOS 16.4" or "Android 13").
+   * - `device` (string): The type of device (e.g., `'Handset'`, `'Tablet'`, `'Desktop'`, etc.).
+   */
+  getDeviceInfoExpo(): { os: string; device: string } {
+    try {
+      const deviceTypeToStringMap = {
+        [Device.DeviceType.UNKNOWN]: 'Unknown',
+        [Device.DeviceType.PHONE]: 'Handset',
+        [Device.DeviceType.TABLET]: 'Tablet',
+        [Device.DeviceType.TV]: 'TV',
+        [Device.DeviceType.DESKTOP]: 'Desktop',
+      };
+
+      const os = `${Platform.OS} ${Device.osVersion || 'Unknown'}`;
+      const device = deviceTypeToStringMap[Device.deviceType || Device.DeviceType.UNKNOWN] || 'Unknown';
+
+      return {
+        os,
+        device,
+      };
+    } catch (err) {
+      console.warn('Device info unavailable', err);
+      return {
+        os: 'Unknown',
+        device: 'Unknown',
+      };
+    }
   }
 
   /**
