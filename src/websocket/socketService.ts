@@ -1,4 +1,4 @@
-import { ActivationState, Client, IFrame, IMessage, StompHeaders } from '@stomp/stompjs';
+import { ActivationState, Client, IFrame, IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { environment } from '../utils/helpers';
 import DeviceInfo from 'react-native-device-info';
@@ -13,10 +13,16 @@ class SocketService {
 
   /**
    * Initializes the STOMP client with the given WebSocket server URL and configuration.
+   * 
    * @param {string} serverURL - The base URL of the WebSocket server.
    * @param {string} sessionKey - The session key for the user.
    * @param {string} token - The authentication token.
-   * @param {(message: string) => {}} [debugCallback] - Optional callback for debugging messages.
+   * @param {(message: string) => void} [debugCallback] - Optional callback for debugging messages.
+   * 
+   * Example usage:
+   * ```typescript
+   * socketService.initialize('https://example.com', 'session123', 'token123', console.log);
+   * ```
    */
   initialize(
     serverURL: string,
@@ -65,11 +71,21 @@ class SocketService {
   }
 
   /**
-   * Subscribes to a specific topic.
-   * @param {string} topic - The topic to subscribe to.
-   * @param {(message: IMessage) => void} callback - The callback function to handle incoming messages.
+   * Subscribes to a specific topic on the WebSocket server.
+   * 
+   * @param {string} topic - The topic to subscribe to (e.g., `/topic/example`).
+   * @param {(message: IMessage) => void} callback - A callback function to handle incoming messages for the topic.
+   * 
+   * @returns {StompSubscription | undefined} The subscription object if the client is initialized, otherwise `undefined`.
+   * 
+   * Example usage:
+   * ```typescript
+   * socketService.subscribe('/topic/example', (message) => {
+   *   console.log('Received message:', message.body);
+   * });
+   * ```
    */
-  subscribe(topic: string, callback: (message: IMessage) => void) {
+  subscribe(topic: string, callback: (message: IMessage) => void): StompSubscription | undefined {
     if (!this.client) {
       console.error('STOMP client is not initialized.');
       return;
@@ -80,7 +96,17 @@ class SocketService {
 
   /**
    * Subscribes to the session notification topic.
-   * @param {(msg: IMessage) => void} callback - The callback function to handle incoming messages.
+   * 
+   * @param {(msg: IMessage) => void} callback - A callback function to handle incoming messages for the session notification topic.
+   * 
+   * @returns {StompSubscription | undefined} The subscription object if the client is initialized, otherwise `undefined`.
+   * 
+   * Example usage:
+   * ```typescript
+   * socketService.subscribeSessionNotifyTopic((msg) => {
+   *   console.log('Session notification:', msg.body);
+   * });
+   * ```
    */
   subscribeSessionNotifyTopic(callback: (msg: IMessage) => void) {
     if (!this.client) {
@@ -93,7 +119,17 @@ class SocketService {
 
   /**
    * Subscribes to the socket notification topic.
-   * @param {(msg: IMessage) => void} callback - The callback function to handle incoming messages.
+   * 
+   * @param {(msg: IMessage) => void} callback - A callback function to handle incoming messages for the socket notification topic.
+   * 
+   * @returns {StompSubscription | undefined} The subscription object if the client is initialized, otherwise `undefined`.
+   * 
+   * Example usage:
+   * ```typescript
+   * socketService.subscribeSocketNotifyTopic((msg) => {
+   *   console.log('Socket notification:', msg.body);
+   * });
+   * ```
    */
   subscribeSocketNotifyTopic(callback: (msg: IMessage) => void) {
     if (!this.client) {
@@ -106,7 +142,17 @@ class SocketService {
 
   /**
    * Subscribes to the socket health topic.
-   * @param {(msg: IMessage) => void} callback - The callback function to handle incoming messages.
+   * 
+   * @param {(msg: IMessage) => void} callback - A callback function to handle incoming messages for the socket health topic.
+   * 
+   * @returns {StompSubscription | undefined} The subscription object if the client is initialized, otherwise `undefined`.
+   * 
+   * Example usage:
+   * ```typescript
+   * socketService.subscribeSocketHealthTopic((msg) => {
+   *   console.log('Socket health:', msg.body);
+   * });
+   * ```
    */
   subscribeSocketHealthTopic(callback: (msg: IMessage) => void) {
     if (!this.client) {
@@ -119,23 +165,33 @@ class SocketService {
 
   /**
    * Subscribes to the application live topic.
-   * @param {(msg: IMessage) => void} callback - The callback function to handle incoming messages.
+   * 
+   * @param {(msg: IMessage) => void} callback - A callback function to handle incoming messages for the application live topic.
+   * 
+   * @returns {StompSubscription | undefined} The subscription object if the client is initialized, otherwise `undefined`.
+   * 
+   * Example usage:
+   * ```typescript
+   * socketService.subscribeAppLiveTopic((msg) => {
+   *   console.log('Application live:', msg.body);
+   * });
+   * ```
    */
   subscribeAppLiveTopic(callback: (msg: IMessage) => void) {
     if (!this.client) {
       console.error('STOMP client is not initialized.');
       return;
     }
+
     return this.subscribe(`/app/live`, callback);
   }
 
   /**
    * Sends a message to a specific destination using the STOMP client.
+   * 
    * @param {string} destination - The destination to send the message to (e.g., a topic or queue).
    * @param {Record<string, string>} [headers={}] - Optional headers to include with the message.
    * @param {any} [body] - The body of the message to send.
-   * @param {boolean} [skipContentLengthHeader=true] - Whether to skip adding the `content-length` header.
-   * @returns {void} Logs an error and exits if the STOMP client is not initialized.
    * 
    * Example usage:
    * ```typescript
@@ -164,7 +220,13 @@ class SocketService {
 
   /**
    * Starts the interval to send health checks.
+   * 
    * @param {SocketService} socketService - The instance of the SocketService.
+   * 
+   * Example usage:
+   * ```typescript
+   * socketService.startHealthCheck(socketService);
+   * ```
    */
   startHealthCheck(socketService: SocketService): void {
     const timeSleep = 3000;
@@ -209,6 +271,7 @@ class SocketService {
    *
    * @param {number} downlinkNetworkQuality - The quality of the downlink network.
    * @param {number} uplinkNetworkQuality - The quality of the uplink network.
+   * @param {null | 'true'} isLow - Indicates if the network is in a low state.
    * 
    * It is calculated based on the uplink transmission bitrate, uplink packet loss rate, RTT (round-trip time) and jitter.
    *
@@ -222,7 +285,7 @@ class SocketService {
    *
    * Example usage:
    * ```typescript
-   * socketService.sendNetworkStatus(1, 2);
+   * socketService.sendNetworkStatus(3, 4, 'true');
    * ```
    */
   sendNetworkStatus(downlinkNetworkQuality: number, uplinkNetworkQuality: number, isLow: null | 'true'): void {
@@ -287,20 +350,16 @@ class SocketService {
 
   /**
    * Retrieves information about the device running the application.
-   *
-   * This method gathers details about the operating system, device type, and browser.
-   * Note that the browser information is not applicable for React Native apps, so it is set to `'N/A'`.
-   *
+   * 
    * @returns {object} An object containing the following properties:
    * - `os` (string): The operating system name and version (e.g., "iOS 16.4" or "Android 13").
    * - `browser` (string): The browser information. Always returns `'N/A'` for React Native apps.
    * - `device` (string): The type of device (e.g., `'Handset'`, `'Tablet'`, `'Desktop'`, etc.).
-   *
+   * 
    * Example usage:
    * ```typescript
    * const deviceInfo = socketService.getDeviceInfo();
    * console.log(deviceInfo);
-   * // Output: { os: 'iOS 16.4', browser: 'N/A', device: 'Handset' }
    * ```
    */
   getDeviceInfo(): { os: string; browser: string; device: string } {
@@ -317,8 +376,15 @@ class SocketService {
 
   /**
    * Connects to the STOMP WebSocket server.
+   * 
+   * @param {Record<string, any>} [deviceInfo={}] - Optional device information to include in the connection headers.
+   * 
+   * Example usage:
+   * ```typescript
+   * socketService.connect({ os: 'iOS', device: 'Handset' });
+   * ```
    */
-  connect(): void {
+  connect(deviceInfo: Record<string, any> = {}): void {
     if (!this.client) {
       console.error('STOMP client is not initialized.');
       return;
@@ -328,8 +394,6 @@ class SocketService {
       console.error('STOMP client is already connected.');
       return;
     }
-
-    const deviceInfo = this.getDeviceInfo();
 
     const socketHeaders: StompHeaders = {
       'Access-Control-Allow-Origin': '*',
@@ -344,9 +408,15 @@ class SocketService {
 
   /**
    * Disconnects from the STOMP WebSocket server.
+   * 
    * @returns {Promise<void>} A promise that resolves when the client is disconnected.
+   * 
+   * Example usage:
+   * ```typescript
+   * await socketService.disconnect();
+   * ```
    */
-  async disconnect() {
+  async disconnect(): Promise<void> {
     if (!this.client) {
       console.error('STOMP client is not initialized.');
       return;
@@ -406,9 +476,15 @@ class SocketService {
 
   /**
    * Cleans up the STOMP client instance by clearing health checks, disconnecting, and unregistering handlers.
+   * 
    * @returns {Promise<void>} A promise that resolves when cleanup is complete.
+   * 
+   * Example usage:
+   * ```typescript
+   * await socketService.cleanup();
+   * ```
    */
-  async cleanup() {
+  async cleanup(): Promise<void> {
     if (!this.client) {
       console.error('STOMP client is not initialized.');
       return;
