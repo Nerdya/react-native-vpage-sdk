@@ -1,7 +1,6 @@
 import { ActivationState, Client, IFrame, IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { environment } from '../utils/helpers';
-import DeviceInfo from 'react-native-device-info';
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 
@@ -351,36 +350,14 @@ class SocketService {
   }
 
   /**
-   * Retrieves device information using react-native-device-info.
-   * 
-   * @returns {object} An object containing the following properties:
-   * - `os` (string): The operating system name and version (e.g., "iOS 16.4" or "Android 13").
-   * - `device` (string): The type of device (e.g., `'Handset'`, `'Tablet'`, `'Desktop'`, etc.).
-   */
-  getDeviceInfo(): { os: string; device: string } {
-    try {
-      const os = `${DeviceInfo.getSystemName()} ${DeviceInfo.getSystemVersion()}`;
-      const device = DeviceInfo.getDeviceType() || 'Unknown';
-
-      return {
-        os,
-        device,
-      };
-    } catch (err) {
-      console.warn('Device info unavailable', err);
-      return {
-        os: 'Unknown',
-        device: 'Unknown',
-      };
-    }
-  }
-
-  /**
    * Retrieves device information using expo-device.
    * 
    * @returns {object} An object containing the following properties:
    * - `os` (string): The operating system name and version (e.g., "iOS 16.4" or "Android 13").
    * - `device` (string): The type of device (e.g., `'Handset'`, `'Tablet'`, `'Desktop'`, etc.).
+   * 
+   * Note: If your project isn't Expo-based, it is recommended to use the `react-native-device-info` library
+   * to retrieve device information instead.
    */
   getDeviceInfoExpo(): { os: string; device: string } {
     try {
