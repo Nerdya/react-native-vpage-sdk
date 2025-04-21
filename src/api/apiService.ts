@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios';
 import { createAPIClient } from './apiClient';
 import { ActionHistory, environment } from '../utils/helpers';
 import { APIClientOptions, ApiResponse, CheckSelfKycDto, ConfigDto, CreateMeetingDto, SubmitDto } from '../types';
+import publicIP from "react-native-public-ip";
 
 /**
  * APIService provides methods to interact with the backend API.
@@ -42,7 +43,7 @@ class APIService {
    * @param params - (Optional) Query parameters for the request.
    * @returns A promise resolving to the response data.
    */
-  private async getNested(endpoint: string, ids: Record<string, any>, params?: Record<string, any>) {
+  private async getChildren(endpoint: string, ids: Record<string, any>, params?: Record<string, any>) {
     const keys = Object.keys(ids);
     for (const key of keys) {
       if (endpoint.toString().includes(':' + key)) {
@@ -84,8 +85,6 @@ class APIService {
     return this.post(endpoint, data);
   }
 
-  // API methods
-
   /**
    * Fetches configuration information for a given appointment.
    * @param appointmentId - The ID of the appointment.
@@ -102,8 +101,37 @@ class APIService {
   }
 
   /**
+   * Retrieves the public IP address of the device.
+   *
+   * This method attempts to fetch the public IP address using the `react-native-public-ip` library.
+   * It includes a timeout mechanism to ensure the operation does not hang indefinitely.
+   *
+   * @param {number} [timeoutMs=3000] - The maximum time (in milliseconds) to wait for the IP address before timing out.
+   * @returns {Promise<string | undefined>} A promise that resolves to the public IP address as a string, or `undefined` if an error occurs.
+   *
+   * Example usage:
+   * ```typescript
+   * const ipAddress = await apiService.getIPAddress();
+   * console.log(ipAddress); // Output: "192.168.1.1" or similar
+   * ```
+   */
+  async getIPAddress(timeoutMs = 3000) {
+    try {
+      const timeout = new Promise<string>((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout")), timeoutMs)
+      );
+  
+      const ip = await Promise.race([publicIP(), timeout]);
+      return ip;
+    } catch (error) {
+      console.error('Error fetching public IP:', error);
+    }
+  };
+
+  /**
    * Creates a meeting for a given appointment.
    * @param appointmentId - The ID of the appointment.
+   * @param customerIp - The customer's public IP address.
    * @param agentId - (Optional) The ID of the agent.
    * @returns A promise resolving to the meeting creation response.
    */
@@ -150,37 +178,6 @@ class APIService {
       console.error('Error submitting:', error);
     }
   }
-
-  /**
-   * Verifies an OTP for a given appointment.
-   * @param appointmentId - The ID of the appointment.
-   * @param otp - The OTP to verify.
-   * @returns A promise resolving to the OTP verification response.
-   */
-  // async verifyOTP(appointmentId: string, otp: string) {
-  //   try {
-  //     const payload = { uuid: appointmentId, appointmentId, otp };
-  //     const res = await this.post(environment.VERIFY_OTP, payload);
-  //     return res as ApiResponse<VerifyOTPDto>;
-  //   } catch (error) {
-  //     console.error('Error verifying OTP:', error);
-  //   }
-  // }
-
-  /**
-   * Resends an OTP for a given appointment.
-   * @param appointmentId - The ID of the appointment.
-   * @returns A promise resolving to the OTP resend response.
-   */
-  // async resendOTP(appointmentId: string) {
-  //   try {
-  //     const payload = { uuid: appointmentId };
-  //     const res = await this.post(environment.RESEND_OTP, payload);
-  //     return res as ApiResponse<ResendOTPDto>;
-  //   } catch (error) {
-  //     console.error('Error resending OTP:', error);
-  //   }
-  // }
 
   /**
    * Checks the self-KYC status for a given session key.
