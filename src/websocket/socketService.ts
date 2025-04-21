@@ -1,6 +1,7 @@
-import { ActivationState, Client, IFrame, IMessage, IPublishParams, StompHeaders } from '@stomp/stompjs';
+import { ActivationState, Client, IFrame, IMessage, StompHeaders } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { environment } from '../utils/helpers';
+import DeviceInfo from 'react-native-device-info';
 
 class SocketService {
   private socket?: any;
@@ -285,6 +286,36 @@ class SocketService {
   }
 
   /**
+   * Retrieves information about the device running the application.
+   *
+   * This method gathers details about the operating system, device type, and browser.
+   * Note that the browser information is not applicable for React Native apps, so it is set to `'N/A'`.
+   *
+   * @returns {object} An object containing the following properties:
+   * - `os` (string): The operating system name and version (e.g., "iOS 16.4" or "Android 13").
+   * - `browser` (string): The browser information. Always returns `'N/A'` for React Native apps.
+   * - `device` (string): The type of device (e.g., `'Handset'`, `'Tablet'`, `'Desktop'`, etc.).
+   *
+   * Example usage:
+   * ```typescript
+   * const deviceInfo = socketService.getDeviceInfo();
+   * console.log(deviceInfo);
+   * // Output: { os: 'iOS 16.4', browser: 'N/A', device: 'Handset' }
+   * ```
+   */
+  getDeviceInfo(): { os: string; browser: string; device: string } {
+    const os = `${DeviceInfo.getSystemName()} ${DeviceInfo.getSystemVersion()}`;
+    const browser = 'N/A';
+    const device = DeviceInfo.getDeviceType();
+  
+    return {
+      os,
+      browser,
+      device,
+    };
+  }
+
+  /**
    * Connects to the STOMP WebSocket server.
    */
   connect(): void {
@@ -298,7 +329,7 @@ class SocketService {
       return;
     }
 
-    const deviceInfo: Record<string, any> = {};
+    const deviceInfo = this.getDeviceInfo();
 
     const socketHeaders: StompHeaders = {
       'Access-Control-Allow-Origin': '*',
