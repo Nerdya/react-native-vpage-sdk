@@ -16,6 +16,7 @@
     "react-native": "^0.78.1",
     "react-native-agora": "^4.5.2",
     "react-native-crypto-js": "^1.0.0",
+    "react-native-device-info": "^14.0.4",
     "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
