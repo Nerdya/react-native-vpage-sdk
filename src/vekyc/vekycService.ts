@@ -157,6 +157,44 @@ class VekycService {
   }
 
   /**
+   * Toggles the microphone state for the local user.
+   * 
+   * @param {boolean} isEnabled - Pass `true` to enable the microphone, or `false` to disable it.
+   * @returns {number | undefined} 0 if successful, or a negative value if the operation fails.
+   * 
+   * Example usage:
+   * ```typescript
+   * vekycService.toggleMicrophone(true); // Enables the microphone
+   * vekycService.toggleMicrophone(false); // Disables the microphone
+   * ```
+   */
+  toggleMicrophone(isEnabled: boolean) {
+    if (!this.engine) {
+      console.error('Engine is not initialized.');
+      return;
+    }
+    return this.engine.enableLocalAudio(isEnabled);
+  }
+
+  /**
+   * Switches the camera between the front and rear cameras.
+   * 
+   * @returns {number | undefined} 0 if successful, or a negative value if the operation fails.
+   * 
+   * Example usage:
+   * ```typescript
+   * vekycService.switchCamera();
+   * ```
+   */
+  switchCamera() {
+    if (!this.engine) {
+      console.error('Engine is not initialized.');
+      return;
+    }
+    return this.engine.switchCamera();
+  }
+
+  /**
    * Stops the local video preview.
    * 
    * @returns {number | undefined} 0 if successful, or a negative value if the operation fails.
