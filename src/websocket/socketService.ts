@@ -1,6 +1,7 @@
 import { ActivationState, Client, IFrame, IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { environment } from '../utils/helpers';
+import { Platform } from 'react-native';
 
 class SocketService {
   private socket?: any;
@@ -345,6 +346,64 @@ class SocketService {
     this.client.onWebSocketClose = onWebSocketClose;
     this.client.onWebSocketError = onWebSocketError;
     this.client.onChangeState = onChangeState;
+  }
+
+  /**
+   * Retrieves device information including the operating system, device model, and browser name.
+   * 
+   * This method attempts to gather device information using the following libraries in order:
+   * 1. `expo-device` - Provides detailed device information. Ensure this library is installed if you want to use it.
+   * 2. `react-native-device-info` - Used as a fallback if `expo-device` is not available. Ensure this library is installed if you want to use it.
+   * 
+   * If neither library is available, it falls back to using `Platform.OS` for the operating system and sets the device name to "Unknown".
+   * 
+   * @param {string} [appName='App'] - The name of the application to be used as the browser name.
+   * @returns {{ os: string; device: string; browser: string }} An object containing the operating system, device model, and browser name.
+   * 
+   * Example usage:
+   * ```typescript
+   * const deviceInfo = socketService.getDeviceInfo('MyApp');
+   * console.log(deviceInfo);
+   * ```
+   */
+  getDeviceInfo(appName = 'App'): { os: string; device: string; browser: string } {
+    try {
+      // Try expo-device first
+      const ExpoDevice = require('expo-device');
+
+      if (ExpoDevice && ExpoDevice.osName && ExpoDevice.osVersion && ExpoDevice.modelName) {
+        return {
+          os: `${ExpoDevice.osName} ${ExpoDevice.osVersion}`,
+          device: ExpoDevice.modelName || 'Unknown',
+          browser: appName,
+        };
+      }
+    } catch (e) {
+      console.warn('expo-device not available:', e);
+    }
+
+    try {
+      // Fallback to react-native-device-info
+      const RNDeviceInfo = require('react-native-device-info');
+
+      if (RNDeviceInfo) {
+        return {
+          os: `${RNDeviceInfo.getSystemName()} ${RNDeviceInfo.getSystemVersion()}`,
+          device: RNDeviceInfo.getDeviceNameSync?.() || RNDeviceInfo.getModel?.() || 'Unknown',
+          browser: appName,
+        };
+      }
+      
+    } catch (e) {
+      console.warn('react-native-device-info not available:', e);
+    }
+
+    // Final fallback
+    return {
+      os: Platform.OS,
+      device: 'Unknown',
+      browser: appName,
+    };
   }
 
   /**
