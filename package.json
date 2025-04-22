@@ -11,6 +11,7 @@
   "private": false,
   "dependencies": {
     "@stomp/stompjs": "^7.1.1",
+    "agora-react-native-rtm": "^1.5.1",
     "axios": "^1.8.4",
     "react": "^19.0.0",
     "react-native": "^0.78.1",
