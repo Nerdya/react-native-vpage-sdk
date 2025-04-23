@@ -6,7 +6,7 @@ class APIClient {
 
   constructor(options?: APIClientOptions) {
     this.client = axios.create({
-      baseURL: options?.baseURL || 'https://ovkyc-gateway-server-uat.mobifi.vn',
+      baseURL: options?.baseURL || 'https://vekyc-gateway-server-uat.mobifi.vn',
       timeout: options?.timeout || 30000,
       headers: options?.headers || { 'Content-Type': 'application/json' },
     });
