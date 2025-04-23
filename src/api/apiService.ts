@@ -6,9 +6,8 @@ import publicIP from "react-native-public-ip";
 
 /**
  * APIService provides methods to interact with the backend API.
- * It encapsulates HTTP GET and POST requests and provides higher-level methods
- * for specific API endpoints such as fetching configuration, creating meetings,
- * verifying OTPs, and more.
+ * It includes functionality for making GET and POST requests, handling dynamic path parameters,
+ * and performing various operations such as fetching configuration, creating meetings, verifying OTPs, and more.
  */
 class APIService {
   private client: AxiosInstance;
@@ -101,26 +100,15 @@ class APIService {
   }
 
   /**
-   * Retrieves the public IP address of the device.
-   *
-   * This method attempts to fetch the public IP address using the `react-native-public-ip` library.
-   * It includes a timeout mechanism to ensure the operation does not hang indefinitely.
-   *
-   * @param {number} [timeoutMs=3000] - The maximum time (in milliseconds) to wait for the IP address before timing out.
-   * @returns {Promise<string | undefined>} A promise that resolves to the public IP address as a string, or `undefined` if an error occurs.
-   *
-   * Example usage:
-   * ```typescript
-   * const ipAddress = await apiService.getIPAddress();
-   * console.log(ipAddress); // Output: "192.168.1.1" or similar
-   * ```
+   * Retrieves the public IP address of the device using the `react-native-public-ip` library.
+   * @param timeoutMs - (Optional) The maximum time (in milliseconds) to wait for the IP address before timing out. Default is 3000ms.
+   * @returns A promise resolving to the public IP address as a string, or `undefined` if an error occurs.
    */
   async getIPAddress(timeoutMs = 3000) {
     try {
       const timeout = new Promise<string>((_, reject) =>
         setTimeout(() => reject(new Error("Timeout")), timeoutMs)
       );
-  
       const ip = await Promise.race([publicIP(), timeout]);
       return ip;
     } catch (error) {
@@ -148,10 +136,10 @@ class APIService {
 
   /**
    * Saves a log entry with action history and optional details.
-   * @param actionHistory - The action history object.
-   * @param detail - (Optional) Additional details for the log.
-   * @param sessionKey - (Optional) The session key.
-   * @returns A promise resolving to the log save response.
+   * @param actionHistory - The action history object to be logged.
+   * @param detail - (Optional) Additional details to include in the log.
+   * @param sessionKey - (Optional) The session key associated with the log.
+   * @returns A promise resolving to the response data of the log save operation.
    */
   async saveLog(actionHistory: ActionHistory, detail = null, sessionKey = null) {
     try {
@@ -181,9 +169,9 @@ class APIService {
 
   /**
    * Verifies an OTP for a given appointment.
-   * @param appointmentId - The ID of the appointment.
-   * @param otp - The OTP to verify.
-   * @returns A promise resolving to the OTP verification response.
+   * @param appointmentId - The unique identifier of the appointment.
+   * @param otp - The one-time password to verify.
+   * @returns A promise resolving to the response data of the OTP verification.
    */
   async verifyOTP(appointmentId: string, otp: string) {
     try {
@@ -197,8 +185,8 @@ class APIService {
 
   /**
    * Resends an OTP for a given appointment.
-   * @param appointmentId - The ID of the appointment.
-   * @returns A promise resolving to the OTP resend response.
+   * @param appointmentId - The unique identifier of the appointment.
+   * @returns A promise resolving to the response data of the OTP resend operation.
    */
   async resendOTP(appointmentId: string) {
     try {
@@ -212,8 +200,8 @@ class APIService {
 
   /**
    * Checks the self-KYC status for a given session key.
-   * @param sessionKey - The session key.
-   * @returns A promise resolving to the self-KYC status.
+   * @param sessionKey - The session key associated with the self-KYC process.
+   * @returns A promise resolving to the response data containing the self-KYC status.
    */
   async checkSelfKYC(sessionKey: string) {
     try {
@@ -227,10 +215,10 @@ class APIService {
 
   /**
    * Hooks a session with the given session ID, session key, and optional agent ID.
-   * @param sessionId - The session ID.
-   * @param sessionKey - The session key.
-   * @param agentId - (Optional) The ID of the agent.
-   * @returns A promise resolving to the hook response.
+   * @param sessionId - The unique identifier of the session.
+   * @param sessionKey - The session key associated with the session.
+   * @param agentId - (Optional) The unique identifier of the agent.
+   * @returns A promise resolving to the response data of the hook operation.
    */
   async hook(sessionId: string, sessionKey: string, agentId = null) {
     try {
@@ -244,8 +232,8 @@ class APIService {
 
   /**
    * Closes a video session for a given session key.
-   * @param sessionKey - The session key.
-   * @returns A promise resolving to the video close response.
+   * @param sessionKey - The session key associated with the video session.
+   * @returns A promise resolving to the response data of the video session closure.
    */
   async closeVideo(sessionKey: string) {
     try {
@@ -258,14 +246,14 @@ class APIService {
   }
 
   /**
-   * Rates a call and provides feedback for both the call and the agent.
-   * @param callRating - The rating for the video call.
-   * @param callFeedback - The feedback for the video call.
-   * @param agentRating - The rating for the agent.
-   * @param agentFeedback - The feedback for the agent.
-   * @returns A promise resolving to the rating response.
+   * Rates a call and provides feedback for both the video call and the agent.
+   * @param callRating - The rating for the video call (e.g., 1-5).
+   * @param callFeedback - The feedback text for the video call.
+   * @param agentRating - The rating for the agent (e.g., 1-5).
+   * @param agentFeedback - The feedback text for the agent.
+   * @returns A promise resolving to the response data of the rating operation.
    */
-  async rateCall(callRating: number, callFeedback: string, agentRating: number, agentFeedback: string) {
+  async rateCall(callRating: string, callFeedback: string, agentRating: string, agentFeedback: string) {
     try {
       const payload = {
         rating_video_call: callRating,
@@ -280,6 +268,11 @@ class APIService {
     }
   }
 
+  /**
+   * Retrieves the list of contracts associated with a given session key.
+   * @param sessionKey - The session key for the meeting.
+   * @returns A promise resolving to the list of contracts.
+   */
   async getContractList(sessionKey: string) {
     try {
       const params = { meetingId: sessionKey };
@@ -290,16 +283,26 @@ class APIService {
     }
   }
 
+  /**
+   * Retrieves the URL of a specific contract associated with a session key.
+   * @param sessionKey - The session key for the contract.
+   * @returns A promise resolving to the contract URL.
+   */
   async getContractURL(sessionKey: string) {
     try {
       const ids = { id: sessionKey };
-      const res = await this.getChildren(environment.GET_CONTRACT_LIST, ids);
+      const res = await this.getChildren(environment.GET_CONTRACT_URL, ids);
       return res as ApiResponse<ContractURLDto>;
     } catch (error) {
       console.error('Error getting contract URL:', error);
     }
   }
 
+  /**
+   * Confirms a contract associated with a given session key.
+   * @param sessionKey - The session key for the contract.
+   * @returns A promise resolving to the confirmation response.
+   */
   async confirmContract(sessionKey: string) {
     try {
       const ids = { id: sessionKey };
@@ -312,7 +315,7 @@ class APIService {
 }
 
 /**
- * Factory function to create an instance of APIService.
+ * Creates and returns an instance of APIService.
  * @param options - (Optional) Configuration options for the Axios client.
  * @returns A new instance of APIService.
  */
