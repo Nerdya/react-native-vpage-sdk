@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { createAPIClient } from './apiClient';
 import { ActionHistory, environment } from '../utils/helpers';
-import { APIClientOptions, ApiResponse, CheckSelfKycDto, ConfigDto, CreateMeetingDto, SubmitDto } from '../types';
+import { APIClientOptions, ApiResponse, CheckSelfKycDto, ConfigDto, ContractDto, ContractURLDto, CreateMeetingDto, ResendOTPDto, SubmitDto, VerifyOTPDto } from '../types';
 import publicIP from "react-native-public-ip";
 
 /**
@@ -180,6 +180,37 @@ class APIService {
   }
 
   /**
+   * Verifies an OTP for a given appointment.
+   * @param appointmentId - The ID of the appointment.
+   * @param otp - The OTP to verify.
+   * @returns A promise resolving to the OTP verification response.
+   */
+  async verifyOTP(appointmentId: string, otp: string) {
+    try {
+      const payload = { uuid: appointmentId, appointmentId, otp };
+      const res = await this.post(environment.VERIFY_OTP, payload);
+      return res as ApiResponse<VerifyOTPDto>;
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+    }
+  }
+
+  /**
+   * Resends an OTP for a given appointment.
+   * @param appointmentId - The ID of the appointment.
+   * @returns A promise resolving to the OTP resend response.
+   */
+  async resendOTP(appointmentId: string) {
+    try {
+      const payload = { uuid: appointmentId };
+      const res = await this.post(environment.RESEND_OTP, payload);
+      return res as ApiResponse<ResendOTPDto>;
+    } catch (error) {
+      console.error('Error resending OTP:', error);
+    }
+  }
+
+  /**
    * Checks the self-KYC status for a given session key.
    * @param sessionKey - The session key.
    * @returns A promise resolving to the self-KYC status.
@@ -246,6 +277,36 @@ class APIService {
       return res as ApiResponse<any>;
     } catch (error) {
       console.error('Error rating:', error);
+    }
+  }
+
+  async getContractList(sessionKey: string) {
+    try {
+      const params = { meetingId: sessionKey };
+      const res = await this.get(environment.GET_CONTRACT_LIST, params);
+      return res as ApiResponse<ContractDto[]>;
+    } catch (error) {
+      console.error('Error getting contract list:', error);
+    }
+  }
+
+  async getContractURL(sessionKey: string) {
+    try {
+      const ids = { id: sessionKey };
+      const res = await this.getChildren(environment.GET_CONTRACT_LIST, ids);
+      return res as ApiResponse<ContractURLDto>;
+    } catch (error) {
+      console.error('Error getting contract URL:', error);
+    }
+  }
+
+  async confirmContract(sessionKey: string) {
+    try {
+      const ids = { id: sessionKey };
+      const res = await this.postChildren(environment.CONFIRM_CONTRACT, ids);
+      return res as ApiResponse<any>;
+    } catch (error) {
+      console.error('Error confirming contract:', error);
     }
   }
 }
