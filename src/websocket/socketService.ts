@@ -1,6 +1,6 @@
 import { ActivationState, Client, IFrame, IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { environment } from '../utils/helpers';
+import { environment } from '../utils/environment';
 import { Platform } from 'react-native';
 
 class SocketService {
