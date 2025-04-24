@@ -1,8 +1,31 @@
 import { AxiosInstance } from 'axios';
 import { createAPIClient } from './apiClient';
-import { ActionHistory, environment } from '../utils/helpers';
+import { environment } from '../utils/environment';
 import { APIClientOptions, ApiResponse, CheckSelfKycDto, ConfigDto, ContractDto, ContractURLDto, CreateMeetingDto, ResendOTPDto, SubmitDto, VerifyOTPDto } from '../types';
 import publicIP from "react-native-public-ip";
+
+export enum ContractAction {
+  AGENT_REJECT = 'AGENT_REJECT',
+  CUSTOMER_CONNECTED = 'CUSTOMER_CONNECTED',
+  CUSTOMER_DISCONNECT = 'CUSTOMER_DISCONNECT',
+  AGENT_CHECK_KYC = 'AGENT_CHECK_KYC',
+  AGENT_CONFIRM_KYC = 'AGENT_CONFIRM_KYC',
+  OTP_CONFIRM = 'OTP_CONFIRM',
+  AGENT_END_CALL = 'AGENT_END_CALL',
+  CALL_TIME_OUT = 'CALL_TIME_OUT',
+  AGENT_DISCONNECT = 'AGENT_DISCONNECT',
+  AGENT_CONFIRM_LEGAL = 'AGENT_CONFIRM_LEGAL',
+  CUSTOMER_END_CALL = 'CUSTOMER_END_CALL',
+  KSV_APPROVE = 'KSV_APPROVE',
+  KSV_NEED_REVIEW = 'KSV_NEED_REVIEW',
+  KSV_REJECT = 'KSV_REJECT',
+  CUSTOMER_CONFIRM = 'CUSTOMER_CONFIRM',
+  CUSTOMER_ACTIVED_LINK = 'CUSTOMER_ACTIVED_LINK',
+  CUSTOMER_OTP_CONFIRMED = 'CUSTOMER_OTP_CONFIRMED',
+  CUSTOMER_TEST_CAM_MIC = 'CUSTOMER_TEST_CAM_MIC',
+  CUSTOMER_INCOMMING = 'CUSTOMER_INCOMMING',
+  OTP_BYPASS = 'OTP_BYPASS',
+}
 
 /**
  * APIService provides methods to interact with the backend API.
@@ -135,15 +158,15 @@ class APIService {
   }
 
   /**
-   * Saves a log entry with action history and optional details.
-   * @param actionHistory - The action history object to be logged.
+   * Saves a log entry with contract action and optional details.
+   * @param contractAction - The contract action to be logged.
    * @param detail - (Optional) Additional details to include in the log.
    * @param sessionKey - (Optional) The session key associated with the log.
    * @returns A promise resolving to the response data of the log save operation.
    */
-  async saveLog(actionHistory: ActionHistory, detail = null, sessionKey = null) {
+  async saveLog(contractAction: ContractAction, detail = null, sessionKey = null) {
     try {
-      const payload = { actionHistory, detail, sessionKey };
+      const payload = { contractAction, detail, sessionKey };
       const res = await this.post(environment.SAVE_LOG, payload);
       return res as ApiResponse<any>;
     } catch (error) {
