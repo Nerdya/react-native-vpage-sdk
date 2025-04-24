@@ -1,4 +1,4 @@
-import { PermissionsAndroid, Platform } from 'react-native';
+import { Permission, PermissionsAndroid, PermissionStatus, Platform } from 'react-native';
 import {
   ChannelProfileType,
   ClientRoleType,
@@ -24,15 +24,55 @@ class VekycService {
   private eventHandler?: IRtcEngineEventHandler;
 
   /**
-   * Requests the necessary permissions for audio and video on Android devices.
-   * @returns A promise resolving when permissions are granted or rejected.
+   * Requests the necessary permissions for audio and video on Android and iOS devices.
+   * @returns A promise resolving to an object containing the permission statuses for each requested permission.
+   * 
+   * **Note:** Ensure your project includes the `react-native-permissions` library for iOS permission handling.
+   * Add the required permissions to your `Info.plist` file:
+   * 
+   * ```xml
+   * <key>NSCameraUsageDescription</key>
+   * <string>We need access to your camera to capture video.</string>
+   * <key>NSMicrophoneUsageDescription</key>
+   * <string>We need access to your microphone to capture audio.</string>
+   * ```
    */
-  async getPermissions() {
+  async getPermissions(): Promise<{ microphone: boolean; camera: boolean }> {
     if (Platform.OS === 'android') {
-      await PermissionsAndroid.requestMultiple([
+      // Request permissions on Android
+      const result = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
         PermissionsAndroid.PERMISSIONS.CAMERA,
       ]);
+      return {
+        microphone: result[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === PermissionsAndroid.RESULTS.GRANTED,
+        camera: result[PermissionsAndroid.PERMISSIONS.CAMERA] === PermissionsAndroid.RESULTS.GRANTED,
+      };
+    } else if (Platform.OS === 'ios') {
+      try {
+        // Request permissions on iOS using react-native-permissions
+        const { request, PERMISSIONS, RESULTS } = require('react-native-permissions');
+        const cameraStatus = await request(PERMISSIONS.IOS.CAMERA);
+        const microphoneStatus = await request(PERMISSIONS.IOS.MICROPHONE);
+  
+        return {
+          microphone: microphoneStatus === RESULTS.GRANTED,
+          camera: cameraStatus === RESULTS.GRANTED,
+        };
+      } catch (error) {
+        console.warn('react-native-permissions not found. Returning default denied permissions.');
+        return {
+          microphone: false,
+          camera: false,
+        };
+      }
+    } else {
+      // Handle unsupported platforms
+      console.warn('getPermissions: Unknown OS.');
+      return {
+        microphone: false,
+        camera: false,
+      };
     }
   }
 
