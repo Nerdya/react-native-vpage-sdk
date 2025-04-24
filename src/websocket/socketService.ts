@@ -183,7 +183,7 @@ class SocketService {
         }
       );
     } catch (error) {
-      console.warn('validateToken: Socket service instance is null.');
+      // console.warn('validateToken: Socket service instance is null.');
     }
   }
 
