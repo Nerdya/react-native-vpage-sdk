@@ -164,9 +164,9 @@ class APIService {
    * @param sessionKey - (Optional) The session key associated with the log.
    * @returns A promise resolving to the response data of the log save operation.
    */
-  async saveLog(contractAction: ContractAction, detail = "", sessionKey = "") {
+  async saveLog(contractAction: ContractAction, detail: any = null, sessionKey: any = "") {
     try {
-      const payload = { contractAction, detail, sessionKey };
+      const payload = { actionHistory: contractAction, detail, sessionKey };
       const res = await this.post(environment.SAVE_LOG, payload);
       return res as ApiResponse<any>;
     } catch (error) {
