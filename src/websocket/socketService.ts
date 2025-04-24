@@ -160,7 +160,7 @@ class SocketService {
     const timeSleep = 3000;
     this.clearHealthCheck();
     if (!socketService) {
-      console.warn('Socket service instance is null.');
+      console.warn('startHealthCheck: Socket service instance is null.');
       return;
     }
     this.timerInterval = setInterval(() => this.validateToken(socketService), timeSleep);
@@ -183,8 +183,7 @@ class SocketService {
         }
       );
     } catch (error) {
-      console.warn('Socket service instance is null. Stopping health check...');
-      this.clearHealthCheck();
+      console.warn('validateToken: Socket service instance is null.');
     }
   }
 
