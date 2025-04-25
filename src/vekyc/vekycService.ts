@@ -1,4 +1,4 @@
-import { Permission, PermissionsAndroid, PermissionStatus, Platform } from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 import {
   ChannelProfileType,
   ClientRoleType,
@@ -10,6 +10,7 @@ import {
   ChannelMediaOptions,
   RtcEngineContext,
 } from 'react-native-agora';
+import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 /**
  * Creates and returns a new RTC engine instance.
@@ -51,7 +52,6 @@ class VekycService {
     } else if (Platform.OS === 'ios') {
       try {
         // Request permissions on iOS using react-native-permissions
-        const { request, PERMISSIONS, RESULTS } = require('react-native-permissions');
         const cameraStatus = await request(PERMISSIONS.IOS.CAMERA);
         const microphoneStatus = await request(PERMISSIONS.IOS.MICROPHONE);
   
@@ -60,18 +60,18 @@ class VekycService {
           camera: cameraStatus === RESULTS.GRANTED,
         };
       } catch (error) {
-        console.warn('react-native-permissions not found. Returning default denied permissions.');
+        console.error('Error requesting permissions on iOS:', error);
         return {
-          microphone: false,
-          camera: false,
+          microphone: true,
+          camera: true,
         };
       }
     } else {
       // Handle unsupported platforms
-      console.warn('getPermissions: Unknown OS.');
+      console.error('getPermissions: Unknown OS.');
       return {
-        microphone: false,
-        camera: false,
+        microphone: true,
+        camera: true,
       };
     }
   }

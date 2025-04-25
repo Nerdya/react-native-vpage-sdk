@@ -17,6 +17,7 @@
     "react-native": "^0.78.1",
     "react-native-agora": "^4.5.2",
     "react-native-crypto-js": "^1.0.0",
+    "react-native-permissions": "^5.3.0",
     "react-native-public-ip": "^1.0.2",
     "sockjs-client": "^1.6.1"
   },
