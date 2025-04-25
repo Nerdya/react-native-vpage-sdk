@@ -10,7 +10,6 @@ import {
   ChannelMediaOptions,
   RtcEngineContext,
 } from 'react-native-agora';
-import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 /**
  * Creates and returns a new RTC engine instance.
@@ -50,22 +49,27 @@ class VekycService {
         camera: result[PermissionsAndroid.PERMISSIONS.CAMERA] === PermissionsAndroid.RESULTS.GRANTED,
       };
     } else if (Platform.OS === 'ios') {
-      try {
-        // Request permissions on iOS using react-native-permissions
-        const cameraStatus = await request(PERMISSIONS.IOS.CAMERA);
-        const microphoneStatus = await request(PERMISSIONS.IOS.MICROPHONE);
+      // try {
+      //   // Request permissions on iOS using react-native-permissions
+      //   const { request, PERMISSIONS, RESULTS } = require('react-native-permissions');
+      //   const cameraStatus = await request(PERMISSIONS.IOS.CAMERA);
+      //   const microphoneStatus = await request(PERMISSIONS.IOS.MICROPHONE);
   
-        return {
-          microphone: microphoneStatus === RESULTS.GRANTED,
-          camera: cameraStatus === RESULTS.GRANTED,
-        };
-      } catch (error) {
-        console.error('Error requesting permissions on iOS:', error);
-        return {
-          microphone: true,
-          camera: true,
-        };
-      }
+      //   return {
+      //     microphone: microphoneStatus === RESULTS.GRANTED,
+      //     camera: cameraStatus === RESULTS.GRANTED,
+      //   };
+      // } catch (error) {
+      //   console.error('Error requesting permissions on iOS:', error);
+      //   return {
+      //     microphone: true,
+      //     camera: true,
+      //   };
+      // }
+      return {
+        microphone: true,
+        camera: true,
+      };
     } else {
       // Handle unsupported platforms
       console.error('getPermissions: Unknown OS.');
