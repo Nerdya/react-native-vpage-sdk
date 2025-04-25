@@ -221,7 +221,7 @@ class VekycService {
    */
   cleanup() {
     if (!this.engine) {
-      console.error('Engine is not initialized.');
+      console.warn('Engine is not initialized, skipping cleanup...');
       return;
     }
     this.leaveChannel();
