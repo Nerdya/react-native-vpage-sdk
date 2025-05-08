@@ -1,6 +1,6 @@
 {
   "name": "react-native-vpage-sdk",
-  "version": "0.0.68",
+  "version": "0.0.69",
   "description": "A lightweight and easy-to-use React Native SDK for integrating real-time video calls with WebSocket-based session tracking.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
