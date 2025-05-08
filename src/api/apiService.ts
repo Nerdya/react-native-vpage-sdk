@@ -191,52 +191,6 @@ class APIService {
   }
 
   /**
-   * Verifies an OTP for a given appointment.
-   * @param appointmentId - The unique identifier of the appointment.
-   * @param otp - The one-time password to verify.
-   * @returns A promise resolving to the response data of the OTP verification.
-   */
-  async verifyOTP(appointmentId: string, otp: string) {
-    try {
-      const payload = { uuid: appointmentId, appointmentId, otp };
-      const res = await this.post(environment.VERIFY_OTP, payload);
-      return res as ApiResponse<VerifyOTPDto>;
-    } catch (error) {
-      console.error('Error verifying OTP:', error);
-    }
-  }
-
-  /**
-   * Resends an OTP for a given appointment.
-   * @param appointmentId - The unique identifier of the appointment.
-   * @returns A promise resolving to the response data of the OTP resend operation.
-   */
-  async resendOTP(appointmentId: string) {
-    try {
-      const payload = { uuid: appointmentId };
-      const res = await this.post(environment.RESEND_OTP, payload);
-      return res as ApiResponse<ResendOTPDto>;
-    } catch (error) {
-      console.error('Error resending OTP:', error);
-    }
-  }
-
-  /**
-   * Checks the self-KYC status for a given session key.
-   * @param sessionKey - The session key associated with the self-KYC process.
-   * @returns A promise resolving to the response data containing the self-KYC status.
-   */
-  async checkSelfKYC(sessionKey: string) {
-    try {
-      const params = { sessionKey };
-      const res = await this.get(environment.CHECK_SELF_KYC, params);
-      return res as ApiResponse<CheckSelfKycDto>;
-    } catch (error) {
-      console.error('Error checking self KYC:', error);
-    }
-  }
-
-  /**
    * Hooks a session with the given session ID, session key, and optional agent ID.
    * @param sessionId - The unique identifier of the session.
    * @param sessionKey - The session key associated with the session.
@@ -265,29 +219,6 @@ class APIService {
       return res as ApiResponse<any>;
     } catch (error) {
       console.error('Error closing video:', error);
-    }
-  }
-
-  /**
-   * Rates a call and provides feedback for both the video call and the agent.
-   * @param callRating - The rating for the video call (e.g., 1-5).
-   * @param callFeedback - The feedback text for the video call.
-   * @param agentRating - The rating for the agent (e.g., 1-5).
-   * @param agentFeedback - The feedback text for the agent.
-   * @returns A promise resolving to the response data of the rating operation.
-   */
-  async rateCall(callRating: string, callFeedback: string, agentRating: string, agentFeedback: string) {
-    try {
-      const payload = {
-        rating_video_call: callRating,
-        customer_feedback: callFeedback,
-        rating_agent: agentRating,
-        customer_feedback_agent: agentFeedback
-      };
-      const res = await this.post(environment.RATING, payload);
-      return res as ApiResponse<any>;
-    } catch (error) {
-      console.error('Error rating:', error);
     }
   }
 
@@ -333,6 +264,29 @@ class APIService {
       return res as ApiResponse<any>;
     } catch (error) {
       console.error('Error confirming contract:', error);
+    }
+  }
+
+  /**
+   * Rates a call and provides feedback for both the video call and the agent.
+   * @param callRating - The rating for the video call (e.g., 1-5).
+   * @param callFeedback - The feedback text for the video call.
+   * @param agentRating - The rating for the agent (e.g., 1-5).
+   * @param agentFeedback - The feedback text for the agent.
+   * @returns A promise resolving to the response data of the rating operation.
+   */
+  async rateCall(callRating: string, callFeedback: string, agentRating: string, agentFeedback: string) {
+    try {
+      const payload = {
+        rating_video_call: callRating,
+        customer_feedback: callFeedback,
+        rating_agent: agentRating,
+        customer_feedback_agent: agentFeedback
+      };
+      const res = await this.post(environment.RATING, payload);
+      return res as ApiResponse<any>;
+    } catch (error) {
+      console.error('Error rating:', error);
     }
   }
 }

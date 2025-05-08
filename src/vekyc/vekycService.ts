@@ -27,8 +27,12 @@ class VekycService {
    * Requests the necessary permissions for audio and video on Android and iOS devices.
    * @returns A promise resolving to an object containing the permission statuses for each requested permission.
    * 
-   * **Note:** Ensure your project includes the `react-native-permissions` library for iOS permission handling.
-   * Add the required permissions to your `Info.plist` file:
+   * **Note:** 
+   * - On Android, the function will request permissions for the microphone and camera and return their statuses.
+   * - On iOS, the function will return default `true` values for both microphone and camera permissions.
+   * - On unsupported platforms, the function will also return default `true` values for both permissions.
+   * 
+   * **Important:** For iOS, add the required permissions to your `Info.plist` file:
    * 
    * ```xml
    * <key>NSCameraUsageDescription</key>
