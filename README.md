@@ -2,33 +2,33 @@
 
 A lightweight and easy-to-use React Native SDK for integrating real-time video calls with WebSocket-based session tracking.
 
-## Usage & Demo
+## Demo
 
-Samples using `react-native-vpage-sdk`
+Sample using `react-native-vpage-sdk`
 
 [https://github.com/Nerdya/vpage-app](https://github.com/Nerdya/vpage-app)
 
-## Installation
+### Installation (React Native >= 0.60.0)
 
-### Installing (React Native >= 0.60.0)
-
-Install `react-native-vpage-sdk` (^4.0.0):
+You can install `react-native-vpage-sdk` using yarn:
 
 ```shell script
 yarn add react-native-vpage-sdk
 ```
 
-or
+or npm:
 
 ```shell script
 npm i react-native-vpage-sdk
 ```
 
-## Methods
+## API
+
+See the method's detailed usage in the documentation comment of the respective method.
 
 ### Web APIs
 
-Use `createAPIService(options)` to initialize an instance of APIService that has the following methods:
+Use `createAPIService(options)` to initialize APIService.
 
 Method | Description
 :- | :-
@@ -45,7 +45,7 @@ Method | Description
 
 ### Crypto
 
-Use `createCryptoService()` to initialize an instance of CryptoService that has the following methods:
+Use `createCryptoService()` to initialize CryptoService.
 
 Method | Description
 :- | :-
@@ -55,7 +55,7 @@ Method | Description
 
 ### VEKYC
 
-Use `createVekycService()` to initialize an instance of VekycService that has the following methods:
+Use `createVekycService()` to initialize VekycService.
 
 Method | Description
 :- | :-
@@ -74,7 +74,7 @@ Method | Description
 
 ### WebSocket
 
-Use `createSocketService()` to initialize an instance of VekycService that has the following methods:
+Use `createSocketService()` to initialize SocketService.
 
 Method | Description
 :- | :-
