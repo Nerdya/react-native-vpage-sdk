@@ -1,14 +1,12 @@
 # react-native-vpage-sdk
 
-A lightweight and easy-to-use React Native SDK for integrating real-time video calls with WebSocket-based session tracking.
+A React Native SDK designed for an **specific integration flow - WS6** in the Video KYC TPC system.
 
-## Demo
+> **Important**: It is not a general-purpose SDK — it must be used as part of a **guided implementation flow**. Please refer to the full [integration flow](#integration-flow) below to ensure proper setup.
 
-Sample using `react-native-vpage-sdk`
+## Installation
 
-[https://github.com/Nerdya/vpage-app](https://github.com/Nerdya/vpage-app)
-
-### Installation (React Native >= 0.60.0)
+> **Note**: Ensure that you have react-native version 0.60.0 or higher installed.
 
 You can install `react-native-vpage-sdk` using yarn:
 
@@ -22,6 +20,204 @@ or npm:
 npm i react-native-vpage-sdk
 ```
 
+## Integration Flow
+
+To successfully integrate `react-native-vpage-sdk`, follow the step-by-step instructions outlined below. These steps cover:
+
+### Prerequisites
+
+> **Note**: Ensure your React Native project has `react-native-vpage-sdk` installed.
+
+Add the required permissions to your project:
+
+- For iOS, update your `Info.plist`:
+
+```xml
+<key>NSCameraUsageDescription</key>
+<string>We need access to your camera to capture video.</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>We need access to your microphone to capture audio.</string>
+```
+
+- For Android, ensure the following permissions are added to your `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+```
+
+Set a config variable:
+
+```typescript
+const config = {
+    vpageBaseUrl: "https://vekyc-vpage-tpc-ui-uat.mobifi.vn",
+    vcoreBaseUrl: "https://vekyc-gateway-server-uat.mobifi.vn",
+    socketBaseUrl: "https://vekyc-vekyc-service-uat.mobifi.vn",
+    socketHealthCheck: 3000,
+    appId: "b2d320ca642f48958f2b5e5cd1b1c547",
+};
+```
+
+### Step 1: Handle the WS6 Link
+
+Parse the WS6 URL to extract the `appointmentId` and `apiToken`:
+
+```typescript
+import { createCryptoService } from 'react-native-vpage-sdk';
+
+const cryptoService = createCryptoService();
+
+const ws6Url = 'https://example.com/partner-redirect-dynamic?appointment_id=12345&token_encrypt=encryptedToken';
+const res = cryptoService.decryptWS6Url(ws6Url);
+const appointmentId = res?.appointmentId;
+const apiToken = res?.token?.split(".")[1];
+```
+
+### Step 2: Create a meeting
+
+Create a meeting to get the `token`, `channelName` and `localUid`:
+
+```typescript
+const res = await apiService.createMeeting(appointmentId, customerIp);
+const appId = config?.appId;
+const token = res?.data?.code;
+const channelName = res?.data?.key;
+const localUid = res?.data?.subId;
+```
+
+### Step 3: Request permissions
+
+Request audio and video permissions:
+
+```typescript
+import { createVekycService } from 'react-native-vpage-sdk';
+
+const vekycService = createVekycService();
+
+const [vekycServiceInstance, setVekycServiceInstance] = useState(vekycService);
+const [isJoined, setIsJoined] = useState(false);
+const [remoteUid, setRemoteUid] = useState(0);
+
+const permissions = await vekycService.getPermissions();
+if (!permissions.microphone || !permissions.camera) {
+    console.error('Permissions not granted');
+    return;
+}
+```
+
+### Step 4: Connect to the WebSocket server
+
+Initialize the STOMP client:
+
+```typescript
+import { createSocketService } from 'react-native-vpage-sdk';
+
+const socketService = createSocketService();
+
+const [socketServiceInstance, setSocketServiceInstance] = useState(socketService);
+
+socketService.initialize(config.socketBaseUrl, channelName, apiToken);
+```
+
+Register the WebSocket event handler:
+
+```typescript
+socketService.registerEventHandler({
+    onConnect: (frame) => {
+        socketService.subscribeSessionNotifyTopic(async (message) => {
+            // Handle session notify messages
+        });
+        socketService.subscribeSocketNotifyTopic((message) => {
+            // Handle socket notify messages
+        });
+        socketService.subscribeSocketHealthTopic((message) => {
+            // Subscribe to extend socket session
+        });
+        socketService.subscribeAppLiveTopic((message) => {
+            // Subscribe to extend token expiration time
+        });
+    },
+    onDisconnect: (frame) => {
+        // Handle socket disconnect event
+    },
+    // Other event handlers...
+});
+```
+
+Connect to the WebSocket server:
+
+```typescript
+socketService.connect(socketService.getDeviceInfo());
+setSocketServiceInstance(socketService);
+```
+
+### Step 5: Join the Video Call
+
+Initialize the RTC engine:
+
+```typescript
+vekycService.initialize(appId);
+```
+
+Register the veKYC event handler:
+
+```typescript
+vekycService.registerEventHandler({
+    onJoinChannelSuccess: () => {
+        vekycService.enableVideo();
+        vekycService.startPreview();
+        setIsJoined(true);
+    },
+    onUserJoined: (_connection, uid) => {
+        setRemoteUid(() => uid);
+    },
+    onUserOffline: (_connection, uid) => {
+        setRemoteUid((prevUid) => (prevUid === uid ? 0 : prevUid));
+    },
+    // Other event handlers...
+});
+```
+
+Join the channel:
+
+```typescript
+vekycService.joinChannel(token, channelName, localUid, {});
+setVekycServiceInstance(vekycService);
+```
+
+### Step 6: Hook a session
+
+Hook to a call session with agent, start the health check if succeed:
+
+```typescript
+const res = await apiService?.hook(channelName, channelName);
+
+socketService.startHealthCheck(socketServiceInstance);
+```
+
+### Step 7: Close call
+
+Close the call session:
+
+```typescript
+const res = await apiService?.closeVideo(channelName);
+```
+
+### Step 8: Cleanup
+
+Cleanup left over resources after closing call.
+
+```typescript
+vekycService.cleanup();
+socketService.cleanup();
+```
+
+## Example Flow
+
+Here’s an example of the complete flow, using `react-native-vpage-sdk`:
+
+[https://github.com/Nerdya/vpage-app](https://github.com/Nerdya/vpage-app)
+
 ## API
 
 See the method's detailed usage in the documentation comment of the respective method.
@@ -33,7 +229,6 @@ Use `createAPIService(options)` to initialize APIService.
 Method | Description
 :- | :-
 `getConfigInfo(appointmentId)` | Fetches configuration information for a given appointment.
-`getIPAddress(timeoutMs?)` | Retrieves the public IP address of the device using the `react-native-public-ip` library.
 `createMeeting(appointmentId, customerIp, agentId?)` | Creates a meeting for a given appointment.
 `saveLog(contractAction, detail?, sessionKey?)` | Saves a log entry with contract action and optional details.
 `hook(sessionId, sessionKey, agentId?)` | Hooks a session with the given session ID, session key, and optional agent ID.
