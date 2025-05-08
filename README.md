@@ -1,14 +1,12 @@
 # react-native-vpage-sdk
 
-`react-native-vpage-sdk` is a lightweight and easy-to-use React Native SDK for integrating real-time video calls with WebSocket-based session tracking. Designed for Android and iOS, this SDK simplifies the implementation of video calls, ensuring seamless connection management and agent-based call routing.
+A lightweight and easy-to-use React Native SDK for integrating real-time video calls with WebSocket-based session tracking.
 
-Features:
+## Usage & Demo
 
-✅ Easy Integration – Initialize and start calls with minimal setup.
+Samples using `react-native-vpage-sdk`
 
-✅ WebSocket Session Tracking – Keep track of live sessions in real time.
-
-✅ Agent-Based Call Handling – Connect users with agents dynamically.
+[https://github.com/Nerdya/vpage-app](https://github.com/Nerdya/vpage-app)
 
 ## Installation
 
@@ -26,54 +24,79 @@ or
 npm i react-native-vpage-sdk
 ```
 
-Also install expo and eas-cli:
+## Methods
 
-```shell script
-yarn add expo
-yarn add eas-cli
-```
+### Web APIs
 
-or
+Use `createAPIService(options)` to initialize an instance of APIService that has the following methods:
 
-```shell script
-npm i expo
-npm i eas-cli
-```
+Method | Description
+:- | :-
+`getConfigInfo(appointmentId)` | Fetches configuration information for a given appointment.
+`getIPAddress(timeoutMs?)` | Retrieves the public IP address of the device using the `react-native-public-ip` library.
+`createMeeting(appointmentId, customerIp, agentId?)` | Creates a meeting for a given appointment.
+`saveLog(contractAction, detail?, sessionKey?)` | Saves a log entry with contract action and optional details.
+`hook(sessionId, sessionKey, agentId?)` | Hooks a session with the given session ID, session key, and optional agent ID.
+`closeVideo(sessionKey)` | Closes a video session for a given session key.
+`getContractList(sessionKey)` | Retrieves the list of contracts associated with a given session key.
+`getContractURL(sessionKey)` | Retrieves the URL of a specific contract associated with a session key.
+`confirmContract(sessionKey)` | Confirms a contract associated with a given session key.
+`rateCall(callRating, callFeedback, agentRating, agentFeedback)` | Rates a call and provides feedback for both the video call and the agent.
 
-### iOS Setup
+### Crypto
 
-Go to your **ios** folder and run:
+Use `createCryptoService()` to initialize an instance of CryptoService that has the following methods:
 
-```shell script
-pod install
-```
-
-## Available Functions
-
-### API
-
-| Function                                                         | Description                                                             |
-|------------------------------------------------------------------|-------------------------------------------------------------------------|
-| `getConfigInfo(appointmentId)`                                   | Retrieves configuration details for a specific appointment.             |
-| `createMeeting(appointmentId, agentId?)`                         | Initiates an eKYC meeting for the given appointment and optional agent. |
-| `saveLog(actionHistory, detail?, sessionKey?)`                   | Logs an action with optional details and session key for tracking.      |
-| `submit(appointmentId, agentId?)`                                | Submits eKYC data for the specified appointment and optional agent.     |
-| `checkSelfKYC(sessionKey)`                                       | Verifies if the session is eligible for self-KYC.                       |
-| `hook(sessionId, sessionKey, agentId?)`                          | Creates a hook for the specified session and optional agent.            |
-| `closeVideo(sessionKey)`                                         | Ends the video session for the provided session key.                    |
-| `rateCall(callRating, callFeedback, agentRating, agentFeedback)` | Submits ratings and feedback for the video call and agent.              |
+Method | Description
+:- | :-
+`encryptionAES(text, key)` | Encrypts a given text using AES encryption with the provided key.
+`decryptionAES(text, key)` | Decrypts a given AES-encrypted text using the provided key.
+`decryptWS6Url(url)` | Decrypts the token from a given URL and extracts the base URL, appointment ID, and decrypted token.
 
 ### VEKYC
 
-```Check demo project```
+Use `createVekycService()` to initialize an instance of VekycService that has the following methods:
 
-## Demo
+Method | Description
+:- | :-
+`getPermissions()` | Requests the necessary permissions for audio and video on Android and iOS devices.
+`initialize(appId)` | Initializes the RTC engine with the provided App ID.
+`registerEventHandler(eventHandler)` | Registers an event handler for receiving RTC engine callbacks.
+`joinChannel(token, channelName, localUid, options?)` | Joins a channel as a broadcaster with the specified options.
+`enableVideo()` | Enables video functionality in the RTC engine.
+`startPreview()` | Starts the local video preview.
+`toggleMicrophone(isEnabled)` | Toggles the microphone state for the local user.
+`switchCamera()` | Switches the camera between the front and rear cameras.
+`stopPreview()` | Stops the local video preview.
+`leaveChannel()` | Leaves the current channel.
+`unregisterEventHandler()` | Unregisters the event handler from the RTC engine.
+`cleanup()` | Cleans up the RTC engine and releases all resources.
 
-Check out the [Demo Application](https://github.com/Nerdya/my-video-app) to see how to use this SDK in a real-world project.
+### WebSocket
 
-## Contributing
+Use `createSocketService()` to initialize an instance of VekycService that has the following methods:
 
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+Method | Description
+:- | :-
+`initialize(serverURL, sessionKey, token, debugCallback?)` | Initializes the STOMP client with the given WebSocket server URL and configuration.
+`subscribe(topic, callback)` | Subscribes to a specific topic on the WebSocket server.
+`subscribeSessionNotifyTopic(callback)` | Subscribes to the session notification topic.
+`subscribeSocketNotifyTopic(callback)` | Subscribes to the socket notification topic.
+`subscribeSocketHealthTopic(callback)` | Subscribes to the socket health topic.
+`subscribeAppLiveTopic(callback)` | Subscribes to the application live topic.
+`send(destination, headers?, body?)` | Sends a message to a specific destination using the STOMP client.
+`clearHealthCheck()` | Clears the health check interval.
+`startHealthCheck(socketService)` | Starts the interval to send health checks.
+`validateToken(socketService)` | Validates the token by sending a health check message.
+`sendNetworkStatus(downlinkNetworkQuality, uplinkNetworkQuality, isLow)` | Sends the network status to the server.
+`registerEventHandler(handlers)` | Registers event handlers for the STOMP client.
+`getDeviceInfo(appName?)` | Retrieves device information including the operating system, device model, and browser name.
+`connect(deviceInfo?)` | Connects to the STOMP WebSocket server.
+`disconnect()` | Disconnects from the STOMP WebSocket server.
+`unregisterEventHandler()` | Unregisters all event handlers for the STOMP client.
+`unsubscribe()` | Unsubscribes from a specific topic.
+`unsubscribeTopics()` | Unsubscribes from all predefined topics.
+`cleanup()` | Cleans up the STOMP client instance by clearing health checks, disconnecting, and unregistering handlers.
 
 ## License
 
