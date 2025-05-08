@@ -1,6 +1,6 @@
 # react-native-vpage-sdk
 
-A React Native SDK designed for an **specific integration flow - WS6** in the Video KYC TPC system.
+A React Native SDK designed for **WS6** (a specific integration flow) in the Video KYC TPC system.
 
 > **Important**: It is not a general-purpose SDK — it must be used as part of a **guided implementation flow**. Please refer to the full [integration flow](#integration-flow) below to ensure proper setup.
 
