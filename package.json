@@ -1,7 +1,7 @@
 {
   "name": "react-native-vpage-sdk",
   "version": "0.0.71",
-  "description": "A lightweight and easy-to-use React Native SDK for integrating real-time video calls with WebSocket-based session tracking.",
+  "description": "A React Native SDK designed for WS6 (a specific integration flow) in the Video KYC TPC system.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
