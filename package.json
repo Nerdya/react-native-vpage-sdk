@@ -1,6 +1,6 @@
 {
   "name": "react-native-vpage-sdk",
-  "version": "0.0.74",
+  "version": "0.0.75",
   "description": "A React Native SDK designed for WS6 (a specific integration flow) in the Video KYC TPC system.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
