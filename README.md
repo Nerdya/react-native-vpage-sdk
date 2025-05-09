@@ -1,6 +1,6 @@
 # react-native-vpage-sdk
 
-A React Native SDK designed for **WS6** (a specific integration flow) in the Video KYC TPC system.
+Deep integration React Native SDK for embedding new VPBank Neo onboarding flows into Android & iOS apps.
 
 > **Important**: It is not a general-purpose SDK — it must be used as part of a **guided implementation flow**. Please refer to the full [integration flow](#integration-flow) below to ensure proper setup.
 
@@ -58,19 +58,13 @@ const config = {
 };
 ```
 
-### Step 1: Handle the WS6 Link
+### Step 1: Get required parameters
 
-Parse the WS6 URL to extract the `appointmentId` and `apiToken`:
+`appointmentId` and `apiToken` will be distributed privately.
 
 ```typescript
-import { createCryptoService } from 'react-native-vpage-sdk';
-
-const cryptoService = createCryptoService();
-
-const ws6Url = 'https://example.com/partner-redirect-dynamic?appointment_id=12345&token_encrypt=encryptedToken';
-const res = cryptoService.decryptWS6Url(ws6Url);
-const appointmentId = res?.appointmentId;
-const apiToken = res?.token?.split(".")[1];
+const appointmentId = "<YOUR_APPOINTMENT_ID>";
+const apiToken = "<YOUR_API_TOKEN>";
 ```
 
 ### Step 2: Create a meeting
