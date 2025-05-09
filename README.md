@@ -50,11 +50,11 @@ Set a config variable:
 
 ```typescript
 const config = {
-    vpageBaseUrl: "https://vekyc-vpage-tpc-ui-uat.mobifi.vn",
-    vcoreBaseUrl: "https://vekyc-gateway-server-uat.mobifi.vn",
-    socketBaseUrl: "https://vekyc-vekyc-service-uat.mobifi.vn",
-    socketHealthCheck: 3000,
-    appId: "b2d320ca642f48958f2b5e5cd1b1c547",
+    vpageBaseUrl: "<YOUR_VPAGE_URL>",
+    vcoreBaseUrl: "<YOUR_VCORE_URL>",
+    socketBaseUrl: "<YOUR_SOCKET_URL>",
+    socketHealthCheck: 3000, // Health check interval in milliseconds
+    appId: "<YOUR_APP_ID>",
 };
 ```
 
@@ -78,6 +78,13 @@ const apiToken = res?.token?.split(".")[1];
 Create a meeting to get the `token`, `channelName` and `localUid`:
 
 ```typescript
+import { createApiService } from 'react-native-vpage-sdk';
+
+const apiService = createApiService({
+    baseUrl: config.vcoreBaseUrl,
+    headers: { token: apiToken }
+});
+
 const res = await apiService.createMeeting(appointmentId, customerIp);
 const appId = config?.appId;
 const token = res?.data?.code;
