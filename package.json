@@ -1,7 +1,7 @@
 {
   "name": "react-native-vpage-sdk",
   "version": "0.0.75",
-  "description": "A React Native SDK designed for WS6 (a specific integration flow) in the Video KYC TPC system.",
+  "description": "Deep integration React Native SDK for embedding new VPBank Neo onboarding flows into Android & iOS apps.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
